@@ -1,10 +1,10 @@
-site_name: My Docs| Sean Njela
-site_description: Professional docs implementation for my Monitoring project.
-site_url: https://sean-njela.github.io/demo_monitoring/
+site_name: K8s Monitoring Project Docs| Sean Njela
+site_description: Professional docs implementation for my K8s Monitoring project.
+site_url: https://sean-njela.github.io/k8s_monitoring/
 site_author: Sean Njela
-repo_url: https://github.com/sean-njela/demo_monitoring/
-repo_name: sean-njela/demo_monitoring/
-edit_uri: edit/main/demo_monitoring/
+repo_url: https://github.com/sean-njela/k8s_monitoring/
+repo_name: sean-njela/k8s_monitoring/
+edit_uri: edit/main/k8s_monitoring/
 copyright: Copyright &copy; 2025 Sean Njela - Personal Portfolio Project
 
 # Configuration
@@ -155,7 +155,6 @@ nav:
       - cAdvisor: 2-project/cadvisor.md
       - Grafana: 2-project/grafana.md
       - Alertmanager: 2-project/alertmanager.md
-      - Docker Swarm: 2-project/swarm.md
       - Portainer: 2-project/portainer.md
       - Setup: 2-project/setup.md
       - How to Read Dashboards: 2-project/reading_dashboards.md

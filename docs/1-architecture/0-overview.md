@@ -1,66 +1,73 @@
-# 🧱 System Architecture Overview
+# 🧱 Kubernetes Monitoring Architecture Overview
 
-This section provides a **high-level overview of the monitoring and observability stack** used in this project. It highlights the **core components**, their responsibilities, and how they work together to provide **end-to-end monitoring, alerting, and visualization** for modern infrastructure and applications.
+This section provides a **high-level overview of the monitoring and observability stack for Kubernetes**. It highlights the **core components**, their responsibilities, and how they work together to deliver **end-to-end monitoring, alerting, and visualization** for clusters and workloads.
 
 ---
 
 ## 📐 Design Philosophy
 
-Our monitoring stack is built around a few guiding principles:
+Our Kubernetes monitoring stack follows these principles:
 
-* **Modular and Composable** → Each tool has a clear responsibility (metrics, alerts, visualization).
-* **Cloud-Native** → Runs seamlessly in containerized/Kubernetes environments.
-* **Automation-First** → Designed for IaC and CI/CD pipelines.
-* **Production-Ready** → Secure defaults, scalable, and extensible.
-* **Developer-Friendly** → Easy to run locally (e.g., with Docker Compose or Kind).
+* **Modular and Composable** → Exporters, Prometheus, Grafana, and Alertmanager each serve a focused role.
+* **Kubernetes-Native** → Uses service discovery, ConfigMaps, and the Prometheus Operator for automation.
+* **Automation-First** → Deployed and managed via Helm charts, Operators, and GitOps pipelines.
+* **Production-Ready** → High-availability Prometheus, RBAC-enabled, and scalable with Thanos/Cortex.
+* **Developer-Friendly** → Can be run locally with **Kind** or Minikube for experimentation.
 
 ---
 
 ## 🧩 Core Components
 
-### 1. Metrics Collection (cAdvisor)
+### 1. Metrics Collection (Exporters & Kube-State-Metrics)
 
-* **cAdvisor** runs on each node to collect **container-level resource usage** (CPU, memory, disk, network).
-* Integrated with Kubernetes via the **kubelet**.
-* Exposes metrics at `/metrics` in **Prometheus format**.
+* **kubelet / cAdvisor** → Collects **container and pod-level resource usage** (CPU, memory, disk, network).
+* **kube-state-metrics** → Exposes the **state of Kubernetes objects** (deployments, pods, nodes, jobs).
+* **Node Exporter** → Provides **node-level OS metrics**.
+* All expose metrics at `/metrics` in **Prometheus format**.
 
-### 2. Monitoring & Storage (Prometheus)
+### 2. Monitoring & Storage (Prometheus / Prometheus Operator)
 
-* **Prometheus** scrapes metrics from cAdvisor, node exporters, and other exporters.
-* Stores data in its **time-series database (TSDB)**.
-* Provides the **PromQL query language** for powerful analysis.
+* **Prometheus** scrapes metrics automatically via **Kubernetes service discovery**.
+* Stores data in a **time-series database (TSDB)**.
+* **Prometheus Operator** manages Prometheus, Alertmanager, and scrape configurations declaratively with CRDs (`ServiceMonitor`, `PodMonitor`, `PrometheusRule`).
+* **PromQL** enables deep querying of cluster and application metrics.
 
 ### 3. Visualization (Grafana)
 
-* **Grafana** connects to Prometheus and displays metrics in **dashboards**.
-* Includes **pre-built dashboards** for containers, nodes, and Kubernetes clusters.
-* Enables engineers to explore, visualize, and share insights.
+* **Grafana** connects to Prometheus and provides **pre-built dashboards** for Kubernetes clusters, nodes, pods, and workloads.
+* Developers and SREs can explore, visualize, and share insights from cluster metrics.
 
 ### 4. Alerting (Alertmanager)
 
 * **Alertmanager** receives alerts from Prometheus.
 * Handles **deduplication, grouping, and routing** of alerts.
-* Sends notifications via **Slack, Email, PagerDuty**, etc.
+* Sends notifications via **Slack, Email, PagerDuty**, or other integrations.
+* Rules are defined in **PrometheusRule CRDs** for Kubernetes-native configuration.
 
 ---
 
-## 🔀 Architecture Diagram
+## 🔀 Kubernetes Monitoring Architecture Diagram
 
 ```mermaid
 flowchart TD
 
-    subgraph Node["Kubernetes Node / Host"]
-        subgraph Containers["Containers"]
-            A1["App Container A"]
-            A2["App Container B"]
+    subgraph Node["Kubernetes Node"]
+        subgraph Pods["Pods & Containers"]
+            A1["App Pod A"]
+            A2["App Pod B"]
         end
-        C["cAdvisor"]
+        C["kubelet / cAdvisor"]
+        N["Node Exporter"]
     end
+
+    KS["kube-state-metrics"]
 
     A1 --> C
     A2 --> C
+    N --> P["Prometheus (via Operator)"]
+    C --> P
+    KS --> P
 
-    C --> P["Prometheus"]
     P --> G["Grafana Dashboards"]
     P --> A["Alertmanager"]
 
@@ -72,14 +79,16 @@ flowchart TD
 
 ## 🔄 Data / Control Flow
 
-1. **Containers** run applications and consume resources.
-2. **cAdvisor** collects resource usage metrics from the kernel (cgroups).
-3. **Prometheus** scrapes metrics from cAdvisor (and other exporters).
-4. **Prometheus TSDB** stores time-series data.
-5. **Grafana** queries Prometheus to render dashboards and visualizations.
-6. **Prometheus rules** evaluate alert conditions (e.g., CPU > 90%).
-7. **Alertmanager** routes alerts to Slack/email.
-8. **Users (SRE/DevOps)** view dashboards and respond to alerts.
+1. **Pods and nodes** run applications and workloads.
+2. **kubelet/cAdvisor** collect container and pod-level metrics.
+3. **kube-state-metrics** exposes cluster object states (deployments, pods, jobs, etc.).
+4. **Node Exporter** collects host-level metrics (CPU, memory, disk).
+5. **Prometheus** scrapes all metrics via Kubernetes service discovery.
+6. **TSDB** stores the metrics for querying.
+7. **Grafana** queries Prometheus and renders dashboards.
+8. **Prometheus Rules** (via CRDs) define alert conditions.
+9. **Alertmanager** routes alerts to notification channels.
+10. **Users (SRE/DevOps)** observe dashboards and respond to incidents.
 
 ---
 
@@ -87,7 +96,6 @@ flowchart TD
 
 * [Quickstart: Getting Started](../0-quickstart/1-getting-started.md)
 * [Prometheus Notes](../2-project/prometheus.md)
-* [cAdvisor Notes](../2-project/cadvisor.md)
 * [Grafana Notes](../2-project/grafana.md)
 * [Alertmanager Notes](../2-project/alertmanager.md)
 
