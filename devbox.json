@@ -5,7 +5,20 @@
     "go-task@3.44",
     "gitflow@1.12",
     "poetry@2.1",
-    "ffmpeg@7.1.1"
+    "ffmpeg@7.1.1",
+    "kubectl@1.33",
+    "helmfile@1.1",
+    "k3d@5.8",
+    "yq@3.4",
+    "jq@1.8",
+    "yamllint@1.37",
+    "kubernetes-helm@3.18",
+    "k9s@0.50",
+    "kind@0.29",
+    "kubectx@0.9",
+    "terraform@1.12",
+    "kubeseal@0.30",
+    "awscli@1.40"
   ],
   "shell": {
     "init_hook": ["source ~/.aliases", "poetry install", "poetry lock", "source ./.venv/bin/activate"],
