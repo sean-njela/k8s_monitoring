@@ -61,7 +61,14 @@ vars:
     sh: date '+%Y%m%d%H%M%S'
   PROM_URL: "Grafana → http://localhost:3000 (admin/admin)"
   GRAF_URL: "Prometheus → http://localhost:9090"
-  PORT_URL: "Portainer → https://localhost:9443"
+  DEV_CLUSTER: k8s-monitoring
+  DEV_NS: k8s-monitoring-ns
+  HELM_REPO_URL: https://prometheus-community.github.io/helm-charts
+  HELM_CHART_NAME: kube-prometheus-stack
+  CUSTOM_HELM_REPO_NAME: prometheus-community
+  CUSTOM_HELM_CHART_NAME: prometheus
+  HELM_VALUES_FILE: prometheus-helm-values.yaml
+  PROM_PORT: 9090
 
 includes:
   # Example include of shared tasks
@@ -82,33 +89,19 @@ tasks:
   setup:
     desc: "⚙️ Setup environment: install dependencies, generate config etc."
 
+
   # ─── Development Task ────────────────────────────────────────────────────────
   dev:
     desc: "🏗️ Provision and start local development environment"
     cmds:
-      - docker swarm init || true
-      - task: deploy-monitoring
-      - task: deploy-portainer
-      - task: status
-      - task: info
+      - task: create-cluster-dev
+      - task: helm-install-prom
+      - task: port-fwd-prom
+
 
   # ─── Production Task ─────────────────────────────────────────────────────────
   prod:
     desc: "🚀 Provision and deploy to production"
-
-  # ─── Cleanup Tasks ───────────────────────────────────────────────────────────
-  cleanup-dev:
-    desc: "🔁 Cleanup development resources only"
-    cmds:
-      - docker stack rm monitoring
-      - docker stack rm portainer
-      - docker swarm leave --force
-
-  cleanup-prod:
-    desc: "🔐 Cleanup production resources only"
-
-  cleanup-all:
-    desc: "🧼 Cleanup dev and prod in one swoop"
 
   # # # # # # # ---------- # # # # # # # ---------- # # # # # # #
   # System Management
@@ -135,30 +128,58 @@ tasks:
     cmds:
       - echo "Prometheus -> {{.PROM_URL}}"
       - echo "Grafana -> {{.GRAF_URL}}"
-      - echo "Portainer -> {{.PORT_URL}}"
 
   status:
     desc: "Check if everything is running"
     cmds:
-      - docker stack ls
-      - docker service ls
-      - task: info
-
-  deploy-monitoring:
-    desc: "Deploy the monitoring stack onto the swarm node"
-    cmds:
-      - docker stack deploy -c docker-compose.yaml monitoring
-
-  deploy-portainer:
-    desc: "Deploy the portainer stack onto the swarm node"
-    cmds:
-      - docker stack deploy -c portainer-agent-stack.yaml portainer
+      - kubectl get all -n {{.DEV_NS}}
 
   versions:
     desc: "List current deployed versions"
     cmds:
       - mike list
 
+  create-cluster-dev:
+    desc: "Create a Kind cluster if it doesn't already exist"
+    cmds:
+      - kind create cluster -n {{.DEV_CLUSTER}} --image kindest/node:v1.33.1 || echo "Cluster already exists"
+      - kubectx kind-{{.DEV_CLUSTER}}
+      - kubectl create namespace {{.DEV_NS}}
+      - kubens {{.DEV_NS}}
+
+  helm-install-prom:
+    desc: "⚙️ Install Prometheus Helm Chart"
+    cmds:
+      - helm repo add {{.CUSTOM_HELM_REPO_NAME}} {{.HELM_REPO_URL}}
+      - helm repo update
+      - helm install {{.CUSTOM_HELM_CHART_NAME}} {{.CUSTOM_HELM_REPO_NAME}}/{{.HELM_CHART_NAME}}
+      - task: prom-helm-values
+
+  prom-helm-values:
+    desc: "Save Helm chart values"
+    cmds:
+      - helm show values {{.CUSTOM_HELM_REPO_NAME}}/{{.HELM_CHART_NAME}} > {{.HELM_VALUES_FILE}}
+      - echo "Open {{.HELM_VALUES_FILE}}"
+
+  port-fwd-prom:
+    desc: "Port forward Prometheus"
+    cmds:
+      - kubectl port-forward svc/prometheus-kube-prometheus-prometheus {{.PROM_PORT}}
+
+  # ─── Cleanup Tasks ───────────────────────────────────────────────────────────
+  cleanup-dev:
+    desc: "🔁 Cleanup development resources only"
+    cmds:
+      - kubens {{.DEV_NS}} || echo "NS switch failed - Error not found"
+      - helm uninstall {{.CUSTOM_HELM_CHART_NAME}} || echo "Helm uninstall failed - Error not found"
+      - helm repo remove {{.CUSTOM_HELM_REPO_NAME}} || echo "Remove Repo failed - Error not found"
+      - kind delete cluster -n {{.DEV_CLUSTER}} || echo "Delete Cluster failed - Error not found"
+
+  cleanup-prod:
+    desc: "🔐 Cleanup production resources only"
+
+  cleanup-all:
+    desc: "🧼 Cleanup dev and prod in one swoop"
 
 
   # # # # # # # ---------- # # # # # # # ---------- # # # # # # #

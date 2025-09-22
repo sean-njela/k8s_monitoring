@@ -15,8 +15,8 @@ The rest of the tools are already installed in the devbox environment
 ## Clone the Repository
 
 ```bash
-git clone https://github.com/sean-njela/demo_monitoring.git
-cd demo_monitoring
+git clone https://github.com/sean-njela/k8s_monitoring.git
+cd k8s_monitoring
 ```
 
 ## Start the Devbox Environment and poetry environment
