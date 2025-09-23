@@ -61,14 +61,17 @@ vars:
     sh: date '+%Y%m%d%H%M%S'
   PROM_URL: "Grafana → http://localhost:3000 (admin/admin)"
   GRAF_URL: "Prometheus → http://localhost:9090"
+  KIND_CLUSTER_NAME: k8s-monitoring-control-plane
   DEV_CLUSTER: k8s-monitoring
   DEV_NS: k8s-monitoring-ns
   HELM_REPO_URL: https://prometheus-community.github.io/helm-charts
   HELM_CHART_NAME: kube-prometheus-stack
   CUSTOM_HELM_REPO_NAME: prometheus-community
   CUSTOM_HELM_CHART_NAME: prometheus
-  HELM_VALUES_FILE: prometheus-helm-values.yaml
+  HELM_VALUES_FILE: k8s/values/prometheus-helm-values.yaml
   PROM_PORT: 9090
+  APP_PORT: 3000
+  ALERTM_PORT: 9093
 
 includes:
   # Example include of shared tasks
@@ -144,7 +147,7 @@ tasks:
     cmds:
       - kind create cluster -n {{.DEV_CLUSTER}} --image kindest/node:v1.33.1 || echo "Cluster already exists"
       - kubectx kind-{{.DEV_CLUSTER}}
-      - kubectl create namespace {{.DEV_NS}}
+      - kubectl create namespace {{.DEV_NS}} || echo "namespace already exists"
       - kubens {{.DEV_NS}}
 
   helm-install-prom:
@@ -152,8 +155,32 @@ tasks:
     cmds:
       - helm repo add {{.CUSTOM_HELM_REPO_NAME}} {{.HELM_REPO_URL}}
       - helm repo update
-      - helm install {{.CUSTOM_HELM_CHART_NAME}} {{.CUSTOM_HELM_REPO_NAME}}/{{.HELM_CHART_NAME}}
+      - helm install {{.CUSTOM_HELM_CHART_NAME}} {{.CUSTOM_HELM_REPO_NAME}}/{{.HELM_CHART_NAME}} -f {{.HELM_VALUES_FILE}}
       - task: prom-helm-values
+
+  helm-upgrade-prom:
+    desc: "⚙️ Upgrade Prometheus Helm Chart"
+    cmds:
+      - kubens {{.DEV_NS}}
+      - helm upgrade {{.CUSTOM_HELM_CHART_NAME}} {{.CUSTOM_HELM_REPO_NAME}}/{{.HELM_CHART_NAME}} -f {{.HELM_VALUES_FILE}}
+
+  deploy-app:
+    desc: "Deploy our application into the cluster"
+    cmds:
+      - kubens {{.DEV_NS}}
+      - kubectl create -f k8s/
+
+  apply-app:
+    desc: "Deploy our application into the cluster"
+    cmds:
+      - kubens {{.DEV_NS}}
+      - kubectl apply -f k8s/
+
+  delete-app:
+    desc: "Deploy our application into the cluster"
+    cmds:
+      - kubens {{.DEV_NS}}
+      - kubectl delete -f k8s/
 
   prom-helm-values:
     desc: "Save Helm chart values"
@@ -164,7 +191,20 @@ tasks:
   port-fwd-prom:
     desc: "Port forward Prometheus"
     cmds:
+      - kubens {{.DEV_NS}}
       - kubectl port-forward svc/prometheus-kube-prometheus-prometheus {{.PROM_PORT}}
+
+  port-fwd-app:
+    desc: "Port forward App"
+    cmds:
+      - kubens {{.DEV_NS}}
+      - kubectl port-forward svc/prometheus-demo-app-svc {{.APP_PORT}}
+
+  port-fwd-alertm:
+    desc: "Port forward App"
+    cmds:
+      - kubens {{.DEV_NS}}
+      - kubectl port-forward svc/alertmanager-operated {{.ALERTM_PORT}}
 
   # ─── Cleanup Tasks ───────────────────────────────────────────────────────────
   cleanup-dev:
@@ -172,8 +212,10 @@ tasks:
     cmds:
       - kubens {{.DEV_NS}} || echo "NS switch failed - Error not found"
       - helm uninstall {{.CUSTOM_HELM_CHART_NAME}} || echo "Helm uninstall failed - Error not found"
-      - helm repo remove {{.CUSTOM_HELM_REPO_NAME}} || echo "Remove Repo failed - Error not found"
-      - kind delete cluster -n {{.DEV_CLUSTER}} || echo "Delete Cluster failed - Error not found"
+      - kubectl delete -f k8s/ || echo "k8s/ deployment doesnt exist"
+      - docker stop {{.KIND_CLUSTER_NAME}} || echo "Container not running"
+      # - helm repo remove {{.CUSTOM_HELM_REPO_NAME}} || echo "Remove Repo failed - Error not found"
+      # - kind delete cluster -n {{.DEV_CLUSTER}} || echo "Delete Cluster failed - Error not found"
 
   cleanup-prod:
     desc: "🔐 Cleanup production resources only"
