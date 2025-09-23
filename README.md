@@ -1,3 +1,4 @@
+sync
 <div align="center">
 
   <!-- Row of icons -->
@@ -241,5 +242,6 @@ Distributed under the MIT License. See `LICENSE` for more info.
 Your Name – [@linkedin](https://linkedin.com/in/sean-njela) – [@twitter/x](https://x.com/devopssean) – [seannjela@outlook.com](mailto:seannjela@outlook.com)
 
 Project Link: [https://github.com/sean-njela/k8s_monitoring](https://github.com/sean-njela/k8s_monitoring)
+
 
 About Me - [About Me](docs/4-about/about.md)
