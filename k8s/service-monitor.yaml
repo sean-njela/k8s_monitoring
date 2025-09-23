@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+
+kind: ServiceMonitor
+
+metadata:
+  name: prometheus-demo-app-svc-monitor
+  labels:
+    # The "release" label must match the Prometheus Operator's Helm release name
+    # or the Prometheus instance's label selector. This ensures Prometheus discovers
+    # and scrapes metrics from this ServiceMonitor.
+    release: prometheus
+    # Arbitrary application label used for grouping and filtering resources.
+    app: prometheus
+
+spec:
+  # "jobLabel" tells Prometheus which label from the target Service should be used
+  # as the "job" label in metrics. If the Service has no such label, the ServiceMonitor
+  # name will be used as a fallback. In this example, it points to a Service label
+  # called "job". If that label is missing, you may want to remove this field or
+  # configure relabelling instead.
+  jobLabel: job
+
+  endpoints:
+    # Each endpoint describes how Prometheus should scrape metrics from the matched Services.
+    - interval: 30s                 # Scrape metrics every 30 seconds.
+      port: prometheus-demo-app-port # Name of the port exposed in the Service definition.
+      path: /swagger-stats/metrics   # HTTP path under which metrics are exposed.
+
+  selector:
+    # "matchLabels" is used to find Services whose labels match this selector.
+    # Only Services with "app: prometheus-demo-app-svc" will be monitored.
+    # This selector must match labels on the Kubernetes Service resource,
+    # not on the Deployment or Pod directly.
+    matchLabels:
+      app: prometheus-demo-app-svc

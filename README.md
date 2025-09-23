@@ -1,4 +1,3 @@
-sync
 <div align="center">
 
   <!-- Row of icons -->

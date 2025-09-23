@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+
+kind: PrometheusRule
+
+metadata:
+  name: prometheus-demo-app-rules
+  labels:
+    # The "release" label must match the Prometheus Operator's Helm release name
+    # or the Prometheus instance's label selector. This allows Prometheus to
+    # discover and load this rule.
+    release: prometheus
+    # Arbitrary app label for grouping resources in the namespace
+    app: prometheus
+
+spec:
+  groups:
+    # Each group is a logical collection of rules evaluated together.
+    - name: prometheus-demo-app   # Name of the rule group
+      rules:
+        # Each element under "rules" is one alerting or recording rule.
+        - alert: down  # Alert name. Must be unique within the group.
+          expr: up == 0  # PromQL expression. "up == 0" means target is unreachable.
+          for: 0m        # Duration for which the condition must hold before firing.
+          labels:
+            severity: critical  # Custom label attached to the alert for routing.
+          annotations:
+            # Human-readable summary shown in alert notifications.
+            summary: Prometheus target missing {{$labels.instance}}
+            # "{{$labels.instance}}" interpolates the failing target's instance label.

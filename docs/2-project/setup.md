@@ -69,6 +69,13 @@ spec:
 
 The `ServiceMonitor` CRD (from the Prometheus Operator) ensures Prometheus automatically discovers and scrapes the exporter.
 
+To list all available CRDs use:
+
+```bash
+kubectl get crd
+```
+![Output](../assets/servicemonitor.png)
+
 ---
 
 ### 3. **Custom metrics (for apps you write)**
@@ -348,3 +355,135 @@ kubectl get service
 # then port forward the Prometheus service
 kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090
 ```
+
+### Deploying the application instance
+
+We placed our `demo_app_deployment.yaml` and `demo_app_svc.yaml` in the `k8s` folder then ran:
+
+```bash
+kubectl create -f k8s/ # creates 2 pods and a service
+# Followed up with:
+task status
+```
+
+Nice, the app is now running in our cluster.
+
+We will have to setup additional prometheus configs so that the app can be scrapped by prometheus.
+
+The recommended way to set up monitoring in this stack, is to make use of **Service Monitors**.
+
+### Setup App Metrics Scrapping
+
+A **Service Monitor** defines a set of targets for prometheus to monitor and scrape.
+
+That way we avoid touching the default configs directly, instead we will be using the CRD to append new targets for Prometheus to scrape.
+
+A service monitor points to a **Service**.
+
+![Service Monitor Yaml Configuration](../assets/servicemonitor-2.png) ![continuation](../assets/servicemonitor-3.png) ![continuation](../assets/servicemonitor-4.png) ![continuation](../assets/servicemonitor-5.png)
+
+The `service-monitor.yaml` file is added alongside the app deployment files in the `k8s/` folder.
+
+```bash
+task apply-app
+# then
+kubectl get servicemonitor # to confirm if our service monitor is deployed
+# output:
+NAME                                                 AGE
+prometheus-demo-app-svc-monitor                      2m13s
+```
+
+Also confirm in the Prometheus web app at `/targets`:
+
+![Prometheus Web UI showing Service Monitor in UP state](../assets/servicemonitor-6.png)
+
+You can also query `{job="prometheus-demo-app-svc"}`:
+
+![Prometheus Web UI showing query results](../assets/servicemonitor-7.png)
+
+### Adding Rules
+
+Prometheus also has a CRD for handling rules named `prometheusrule`.
+
+
+![Screenshot of PrometheusRules Yaml file](../assets/prometheusrules-1.png)
+
+![Screenshot of PrometheusRules Release matchlabel](../assets/prometheusrules-2.png)
+
+The `prometheusrules.yaml` file is added alongside the app deployment files in the `k8s/` folder.
+
+```bash
+task apply-app
+# then
+kubectl get prometheusrule # to confirm if our service monitor is deployed
+# output:
+NAME                                                              AGE
+prometheus-demo-app-rules                                         60s
+```
+
+Also confirm in the Prometheus web app at `/rules`:
+
+![Prometheus Web UI showing /rules section](../assets/prometheusrules-3.png)
+
+### Adding Alert Manager Rules
+
+Prometheus also has a CRD for handling alert manager rules named `AlertmangerConfig`.
+
+![Screenshot of AlertmanagerConfig Yaml file](../assets/alertmanagerconfig-1.png)
+
+![Screenshot of differences in the Alertmanager Yaml config](../assets/alertmanagerconfig-3.png)
+
+![Screenshot of AlertmangerConfig Selector](../assets/alertmanagerconfig-2.png)
+
+By default this selector is not in prometheus' `values.yaml` so we have to add it.
+
+```bash
+task prom-helm-values
+```
+
+Then edit the following:
+
+```yaml
+alertmanagerConfigSelector:
+  matchLabels:
+    resource: prometheus
+```
+
+Then apply:
+
+```bash
+task helm-upgrade-prom
+```
+
+![Screenshot showing the commands in action](../assets/alertmanagerconfig-4.png)
+
+The `alertmanager-config.yaml` file is added alongside the app deployment files in the `k8s/` folder.
+
+```bash
+task apply-app
+# then
+kubectl get alertmanagers.monitoring.coreos.com -o yaml # to confirm if our service monitor is deployed
+# output:
+# serach for:
+...
+    alertmanagerConfigSelector:
+      matchLabels:
+        resource: prometheus
+...
+# and
+kubectl get alertmanagerconfig
+# output:
+NAME                               AGE
+prometheus-demo-app-alert-config   7m59s
+# then:
+task port-fwd-alertm
+# and visit /localhost:9093
+```
+
+Also confirm in the Prometheus web app at `/rules`:
+
+![Prometheus Web UI showing /rules section](../assets/alertmanager.png)
+
+This confirms our setup is complete !
+
+---
