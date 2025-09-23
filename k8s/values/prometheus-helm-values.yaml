@@ -947,7 +947,7 @@ alertmanager:
 
     ## AlertmanagerConfigs to be selected to merge and configure Alertmanager with.
     ##
-    alertmanagerConfigSelector: {}
+    # alertmanagerConfigSelector: {}
     ## Example which selects all alertmanagerConfig resources
     ## with label "alertconfig" with values any of "example-config" or "example-config-2"
     # alertmanagerConfigSelector:
@@ -959,9 +959,9 @@ alertmanager:
     #         - example-config-2
     #
     ## Example which selects all alertmanagerConfig resources with label "role" set to "example-config"
-    # alertmanagerConfigSelector:
-    #   matchLabels:
-    #     role: example-config
+    alertmanagerConfigSelector:
+      matchLabels:
+        resource: prometheus
 
     ## Namespaces to be selected for AlertmanagerConfig discovery. If nil, only check own namespace.
     ##
@@ -4010,7 +4010,7 @@ prometheus:
     image:
       registry: quay.io
       repository: prometheus/prometheus
-      tag: v3.5.0
+      tag: v3.6.0
       sha: ""
       pullPolicy: IfNotPresent
 

@@ -1,0 +1,21 @@
+apiVersion: v1
+
+kind: Service
+
+metadata:
+  name: prometheus-demo-app-svc
+  labels:
+    app: prometheus-demo-app-svc
+    job: prometheus-demo-app-svc
+
+spec:
+  ports:
+  - name: prometheus-demo-app-port
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+
+  selector:
+    app: prometheus-demo-app
+
+  type: ClusterIP

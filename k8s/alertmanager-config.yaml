@@ -1,0 +1,39 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+
+kind: AlertmanagerConfig
+
+metadata:
+  name: prometheus-demo-app-alert-config
+  labels:
+    # The "release" label must match the Prometheus Operator's Helm release name
+    # or the Alertmanager instance's label selector. This ensures the Operator
+    # discovers and applies this configuration to the correct Alertmanager cluster.
+    release: prometheus
+    # Arbitrary label used for grouping and filtering resources.
+    app: prometheus
+
+spec:
+  route:
+    # "groupBy" controls how alerts are grouped before being sent to a receiver.
+    # Here alerts are grouped by their "severity" label (e.g. critical, warning).
+    groupBy: ["severity"]
+    # "groupWait" is how long Alertmanager waits to send the first notification
+    # after a new alert group is created. This allows time for similar alerts to arrive.
+    groupWait: 30s
+    # "groupInterval" (note: case-sensitive, must be `groupInterval` not `groupinterval`)
+    # defines the minimum time between notifications for the same alert group.
+    # Here it is set to 5 minutes.
+    groupInterval: 5m
+    # "repeatInterval" is how often a notification is re-sent if the alert is still firing.
+    # Here, every 12 hours a reminder is sent until the alert resolves.
+    repeatInterval: 12h
+    # "receiver" specifies the default receiver to which grouped alerts are sent.
+    # Must match a receiver defined under "receivers" below.
+    receiver: "webhook"
+
+  receivers:
+    # Receivers define the actual integrations that handle alerts (e.g. email, Slack, webhook).
+    - name: "webhook"  # Must match the route.receiver field above.
+      webhookConfigs:
+        # Each webhookConfig defines a webhook endpoint for delivering alerts.
+        - url: "http://example.com"  # Replace with an actual webhook listener endpoint.

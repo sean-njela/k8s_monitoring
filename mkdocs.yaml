@@ -156,6 +156,7 @@ nav:
       - Grafana: 2-project/grafana.md
       - Alertmanager: 2-project/alertmanager.md
       - Portainer: 2-project/portainer.md
+      - Helm: 2-project/helm.md
       - Setup: 2-project/setup.md
       - How to Read Dashboards: 2-project/reading_dashboards.md
       # etc.
