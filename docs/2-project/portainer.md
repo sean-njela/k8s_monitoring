@@ -1,6 +1,6 @@
 # Portainer
 
-## 🐳 What is Portainer?
+## What is Portainer?
 
 Portainer is an **open-source container management platform** that provides a **graphical user interface (GUI)** and API for managing:
 
@@ -11,11 +11,11 @@ Portainer is an **open-source container management platform** that provides a **
 
 It simplifies **container lifecycle management**, making it easy for both beginners and experienced DevOps engineers to manage infrastructure without deep CLI expertise.
 
-👉 Think of Portainer as the **"control panel" for containers and clusters**.
+Think of Portainer as the **"control panel" for containers and clusters**.
 
 ---
 
-## 🧐 Why Do We Need Portainer?
+## Why Do We Need Portainer?
 
 Modern container platforms (Docker/Kubernetes) are:
 
@@ -32,7 +32,7 @@ Portainer solves this by:
 
 ---
 
-## ⚙️ Core Features of Portainer
+## Core Features of Portainer
 
 1. **Universal Platform Support**
 
@@ -59,7 +59,7 @@ Portainer solves this by:
 
 5. **Security**
 
-   * Centralized secrets management.
+   * Centralised secrets management.
    * Registry credentials management.
 
 6. **Multi-Cluster / Multi-Environment**
@@ -68,7 +68,7 @@ Portainer solves this by:
 
 ---
 
-## 🏗️ Portainer Architecture
+## Portainer Architecture
 
 ```mermaid
 flowchart TD
@@ -105,7 +105,7 @@ flowchart TD
 
 ---
 
-### 🔎 Explanation of the Flow
+### Explanation of the Flow
 
 1. **Users** interact via **browser UI** or **API clients**.
 2. **Portainer Server** handles UI, API, authentication, and persistence.
@@ -114,7 +114,7 @@ flowchart TD
 
 ---
 
-## 🖥️ User Flow in Portainer
+## User Flow in Portainer
 
 ```mermaid
 sequenceDiagram
@@ -136,18 +136,18 @@ sequenceDiagram
 
 ---
 
-## 🔍 Key Strengths of Portainer
+## Key Strengths of Portainer
 
 * **Ease of Use** → GUI + templates for beginners.
 * **Multi-platform** → Manage Docker, Swarm, Kubernetes, Nomad.
 * **RBAC** → Role-based access control for teams.
 * **Security** → Secrets, registries, LDAP integration.
-* **Centralized** → Manage multiple clusters/environments in one place.
+* **Centralised** → Manage multiple clusters/environments in one place.
 * **Quick Learning Curve** → Great for onboarding DevOps teams.
 
 ---
 
-## ⚠️ Limitations & Watch Outs
+## Limitations & Watch Outs
 
 * **Abstracts Complexity** → advanced Kubernetes users may find it restrictive.
 * **Enterprise Features** (RBAC, registry management, OAuth) → only in **Portainer Business Edition**.
@@ -156,7 +156,7 @@ sequenceDiagram
 
 ---
 
-## 🚀 Portainer Editions
+## Portainer Editions
 
 | Edition                    | Use Case              | Key Features                                                        |
 | -------------------------- | --------------------- | ------------------------------------------------------------------- |
@@ -165,7 +165,7 @@ sequenceDiagram
 
 ---
 
-## 🛠️ Common Use Cases
+## Common Use Cases
 
 * **Learning Kubernetes/Docker** with less CLI hassle.
 * **SMBs** running Docker/Swarm with limited DevOps expertise.
@@ -174,7 +174,7 @@ sequenceDiagram
 
 ---
 
-## 🐳 Deployment Examples
+## Deployment Examples
 
 ### 1. Deploy Portainer in Docker
 
@@ -230,17 +230,17 @@ spec:
 
 ---
 
-## 🔐 Security Best Practices
+## Security Best Practices
 
-* ✅ Restrict access to the Portainer UI with **TLS + strong auth**.
-* ✅ Use **RBAC** to enforce least privilege.
-* ✅ Integrate with LDAP/OAuth/AD (BE only).
-* ✅ Don’t expose Docker socket (`/var/run/docker.sock`) publicly.
-* ✅ Apply **network policies** in Kubernetes.
+* Restrict access to the Portainer UI with **TLS + strong auth**.
+* Use **RBAC** to enforce least privilege.
+* Integrate with LDAP/OAuth/AD (BE only).
+* Don’t expose Docker socket (`/var/run/docker.sock`) publicly.
+* Apply **network policies** in Kubernetes.
 
 ---
 
-## 🔄 Portainer vs Alternatives
+## Portainer vs Alternatives
 
 | Tool               | Focus                 | Strengths                        | Weaknesses                    |
 | ------------------ | --------------------- | -------------------------------- | ----------------------------- |
@@ -251,9 +251,9 @@ spec:
 
 ---
 
-## 🧾 Portainer Cheat Sheet
+## Portainer Cheat Sheet
 
-### ✅ Key Concepts
+### Key Concepts
 
 | Term             | Meaning                                                   |
 | ---------------- | --------------------------------------------------------- |
@@ -265,7 +265,7 @@ spec:
 
 ---
 
-### 🔧 Useful Commands
+### Useful Commands
 
 **Deploy Portainer on Docker**
 
@@ -282,7 +282,7 @@ kubectl apply -n portainer -f https://downloads.portainer.io/portainer-agent-k8s
 
 ---
 
-## 🎯 Final Takeaway
+## Final Takeaway
 
 Portainer is:
 
@@ -291,11 +291,11 @@ Portainer is:
 * **Secure & Enterprise-ready** (in BE) → RBAC, SSO, auditing.
 * **Not a replacement for monitoring/logging** → should be paired with Prometheus, Grafana, Loki, etc.
 
-👉 If you want a **centralized, easy-to-use container management dashboard**, Portainer is an excellent choice.
+If you want a **centralised, easy-to-use container management dashboard**, Portainer is an excellent choice.
 
 ---
 
-## 🔎 How Portainer Works in Swarm
+## How Portainer Works in Swarm
 
 You **don’t need to attach your application containers (Grafana, Prometheus, nginx, etc.) to the `agent_network`** that Portainer uses.
 
@@ -307,7 +307,7 @@ So, even if your app containers are only on the `monitoring` network, Portainer 
 
 ---
 
-## ✅ When to Use `agent_network`
+## When to Use `agent_network`
 
 * Only the **Portainer server** and **Portainer agents** need to be on `agent_network`.
 * Other stacks/services (Grafana, Prometheus, nginx, etc.) stay on their own networks (`monitoring`, etc.).
@@ -315,14 +315,14 @@ So, even if your app containers are only on the `monitoring` network, Portainer 
 
 ---
 
-## 🚫 When NOT to Add to `agent_network`
+## When NOT to Add to `agent_network`
 
 * You don’t want all your app services unnecessarily exposed to the Portainer service network.
 * It can clutter the DNS namespace and increase security exposure.
 
 ---
 
-✅ **Best Practice Setup**:
+**Best Practice Setup**:
 
 * **Portainer/Agent** → use `agent_network`.
 * **Your app stack** (Prometheus, Grafana, etc.) → use their own networks (`monitoring`, etc.).
@@ -330,7 +330,7 @@ So, even if your app containers are only on the `monitoring` network, Portainer 
 
 ---
 
-## 🔎 How Swarm Stacks Work
+## How Swarm Stacks Work
 
 You **can (and usually should)** keep **Portainer** in its **own stack**, separate from your monitoring stack.
 
@@ -342,12 +342,14 @@ You **can (and usually should)** keep **Portainer** in its **own stack**, separa
     docker stack deploy -c monitoring.yml monitoring
     docker stack deploy -c portainer.yml portainer
     ```
+
   * Services in stack `monitoring` are prefixed like:
 
     ```
     monitoring_grafana
     monitoring_prometheus
     ```
+
   * Services in stack `portainer` are prefixed like:
 
     ```
@@ -362,7 +364,7 @@ You **can (and usually should)** keep **Portainer** in its **own stack**, separa
 
 ---
 
-## ✅ Portainer Stack (Standalone)
+## Portainer Stack (Standalone)
 
 Portainer only needs:
 
@@ -373,7 +375,7 @@ It does **not** need the `monitoring` network.
 
 ---
 
-## ✅ Monitoring Stack (Standalone)
+## Monitoring Stack (Standalone)
 
 Prometheus, Grafana, exporters, etc. only need:
 
@@ -384,26 +386,26 @@ They do **not** need the `agent_network`.
 
 ---
 
-## 🔗 How Portainer Sees Other Stacks
+## How Portainer Sees Other Stacks
 
 * The **Portainer Agent** talks to the **Docker API socket** on each node.
 * That API knows about **all stacks, services, volumes, networks, and tasks** in the Swarm.
 * So Portainer will display your **monitoring stack** in the UI automatically, even though it’s on a completely different network.
 
-👉 No need to manually connect `monitoring` stack services to the `agent_network`.
+No need to manually connect `monitoring` stack services to the `agent_network`.
 
 ---
 
-## ⚡ Best Practice
+## Best Practice
 
-* ✅ Deploy **Portainer stack separately** (`docker stack deploy -c portainer.yml portainer`).
-* ✅ Deploy **Monitoring stack separately** (`docker stack deploy -c monitoring.yml monitoring`).
-* ✅ Keep **networks isolated per stack**, unless you explicitly need inter-stack communication.
-* ✅ Only use **external overlay networks** if two stacks need to talk to each other.
+* Deploy **Portainer stack separately** (`docker stack deploy -c portainer.yml portainer`).
+* Deploy **Monitoring stack separately** (`docker stack deploy -c monitoring.yml monitoring`).
+* Keep **networks isolated per stack**, unless you explicitly need inter-stack communication.
+* Only use **external overlay networks** if two stacks need to talk to each other.
 
 ---
 
-⭐ **Analogy**:
+**Analogy**:
 Think of **Portainer** as a **control tower**.
 
 * It doesn’t sit on the same runway as planes (your apps).
