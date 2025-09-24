@@ -106,7 +106,7 @@ tasks:
     cmds:
       - task: create-cluster-dev
       - task: helm-install-prom
-      - task: install-app
+      - task: deploy-app
 
 
   # ─── Development Task ────────────────────────────────────────────────────────

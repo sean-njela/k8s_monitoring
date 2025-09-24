@@ -120,10 +120,10 @@
 ```bash
 task setup
 
-task dev
+task status # check if everything is running
 
 # GIVE EVERYTHING A MINUTE TO SETUP THEN
-task status # check if everything is running
+task dev # prints garafana password and port forwards the service
 ```
 
 Everything ran well if you see the following output:
