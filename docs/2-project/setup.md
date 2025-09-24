@@ -13,7 +13,7 @@ Kubernetes already integrates with:
 * **kubelet/cAdvisor** → container & pod-level resource usage (CPU, memory, network, filesystem).
 * **Node Exporter** → node-level OS metrics.
 
-✅ If you deploy Prometheus (via Helm or the Operator), these metrics are automatically discovered and scraped — no extra setup required.
+If you deploy Prometheus (via Helm or the Operator), these metrics are automatically discovered and scraped — no extra setup required.
 
 ---
 
@@ -26,7 +26,7 @@ Many apps expose metrics directly, or you deploy an **exporter sidecar or Servic
 * **MySQL** → [mysqld\_exporter](https://github.com/prometheus/mysqld_exporter)
 * **Redis** → [redis\_exporter](https://github.com/oliver006/redis_exporter)
 
-📌 Example: **Nginx Exporter Deployment**
+Example: **Nginx Exporter Deployment**
 
 ```yaml
 apiVersion: apps/v1
@@ -86,7 +86,7 @@ If you’re building your own application, you can instrument it with OpenTeleme
 * Python → [prometheus\_client](https://github.com/prometheus/client_python)
 * Node.js → [prom-client](https://github.com/siimon/prom-client)
 
-📌 Example: Python Flask app exposing `/metrics`
+Example: Python Flask app exposing `/metrics`
 
 ```python
 from flask import Flask
@@ -109,15 +109,15 @@ Deploy the app with a Kubernetes `Deployment` and expose `/metrics`. Then define
 
 ---
 
-## 📌 Summary
+## Summary
 
-* ✅ **Infra metrics** → kubelet/cAdvisor + Node Exporter.
-* ✅ **App metrics** → Exporters (Nginx, DBs, etc.) or custom instrumentation.
-* ✅ Prometheus scrapes everything; Grafana dashboards visualize it.
+* **Infra metrics** → kubelet/cAdvisor + Node Exporter.
+* **App metrics** → Exporters (Nginx, DBs, etc.) or custom instrumentation.
+* Prometheus scrapes everything; Grafana dashboards visualize it.
 
 ---
 
-## 🔎 What OpenTelemetry Adds
+## What OpenTelemetry Adds
 
 * **Instrumentation SDKs** → for Go, Python, Java, Node.js, .NET, etc.
 * Collects **application metrics**, **traces**, and optionally **logs**.
@@ -151,9 +151,9 @@ If you add **OpenTelemetry for your app**:
 
 ---
 
-## ⚡ Example: OTel Collector in Kubernetes
+## Example: OTel Collector in Kubernetes
 
-📌 Deploy the collector:
+Deploy the collector:
 
 ```yaml
 apiVersion: apps/v1
@@ -224,7 +224,7 @@ Now:
 
 ---
 
-## ✅ Why OTel is a Good Idea in Kubernetes
+## Why OTel is a Good Idea in Kubernetes
 
 * **Cloud-native standard** → portable across Prometheus, Grafana, Jaeger, Tempo, etc.
 * **Future-proof** → works with managed observability platforms (Datadog, New Relic, Grafana Cloud, etc.).
@@ -480,10 +480,77 @@ task port-fwd-alertm
 # and visit /localhost:9093
 ```
 
+!!!tip 
+    When port fowarding, the port number is always the one exposed by the service or Pod or you can specify as `HOST:SVC/POD`
+
 Also confirm in the Prometheus web app at `/rules`:
 
 ![Prometheus Web UI showing /rules section](../assets/alertmanager.png)
 
+
+### Grafana Dashboards
+
+The Helm chart already has pre-configured dashboards.
+
+We port forward the Grafana UI:
+
+```bash
+task port-fwd-graf
+```
+
+!!!tip 
+    When port fowarding, the port number is always the one exposed by the service or Pod or you can specify as `HOST:SVC/POD`
+
+We then add other dashboards namely: `15661`.
+
+![Screenshot of the Dashboard](../assets/dashboard.png)
+
+We can also add instrumentation for our app and add to prometheus scrape config and also add relevant dashboards.
+
 This confirms our setup is complete !
+
+```bash
+> task status
+task: [status] kubectl get all -n k8s-monitoring-ns
+[status] NAME                                                         READY   STATUS    RESTARTS      AGE
+[status] pod/alertmanager-prometheus-kube-prometheus-alertmanager-0   2/2     Running   2 (58m ago)   116m
+[status] pod/prometheus-demo-app-794dc7c997-bz9fp                     1/1     Running   1 (58m ago)   107m
+[status] pod/prometheus-demo-app-794dc7c997-g4275                     1/1     Running   1 (58m ago)   107m
+[status] pod/prometheus-grafana-674cf8cb44-v8vlb                      3/3     Running   3 (58m ago)   117m
+[status] pod/prometheus-kube-prometheus-operator-7984bfd549-g9gnx     1/1     Running   2 (57m ago)   117m
+[status] pod/prometheus-kube-state-metrics-7c5fb9d798-xwdpq           1/1     Running   2 (57m ago)   117m
+[status] pod/prometheus-prometheus-kube-prometheus-prometheus-0       2/2     Running   2 (58m ago)   116m
+[status] pod/prometheus-prometheus-node-exporter-scsd8                1/1     Running   1 (58m ago)   117m
+[status]
+[status] NAME                                              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+[status] service/alertmanager-operated                     ClusterIP   None            <none>        9093/TCP,9094/TCP,9094/UDP   116m
+[status] service/prometheus-demo-app-svc                   ClusterIP   10.96.139.140   <none>        3000/TCP                     107m
+[status] service/prometheus-grafana                        ClusterIP   10.96.199.255   <none>        80/TCP                       117m
+[status] service/prometheus-kube-prometheus-alertmanager   ClusterIP   10.96.210.241   <none>        9093/TCP,8080/TCP            117m
+[status] service/prometheus-kube-prometheus-operator       ClusterIP   10.96.75.79     <none>        443/TCP                      117m
+[status] service/prometheus-kube-prometheus-prometheus     ClusterIP   10.96.219.164   <none>        9090/TCP,8080/TCP            117m
+[status] service/prometheus-kube-state-metrics             ClusterIP   10.96.12.61     <none>        8080/TCP                     117m
+[status] service/prometheus-operated                       ClusterIP   None            <none>        9090/TCP                     116m
+[status] service/prometheus-prometheus-node-exporter       ClusterIP   10.96.96.156    <none>        9100/TCP                     117m
+[status]
+[status] NAME                                                 DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+[status] daemonset.apps/prometheus-prometheus-node-exporter   1         1         1       1            1           kubernetes.io/os=linux   117m
+[status]
+[status] NAME                                                  READY   UP-TO-DATE   AVAILABLE   AGE
+[status] deployment.apps/prometheus-demo-app                   2/2     2            2           107m
+[status] deployment.apps/prometheus-grafana                    1/1     1            1           117m
+[status] deployment.apps/prometheus-kube-prometheus-operator   1/1     1            1           117m
+[status] deployment.apps/prometheus-kube-state-metrics         1/1     1            1           117m
+[status]
+[status] NAME                                                             DESIRED   CURRENT   READY   AGE
+[status] replicaset.apps/prometheus-demo-app-794dc7c997                   2         2         2       107m
+[status] replicaset.apps/prometheus-grafana-674cf8cb44                    1         1         1       117m
+[status] replicaset.apps/prometheus-kube-prometheus-operator-7984bfd549   1         1         1       117m
+[status] replicaset.apps/prometheus-kube-state-metrics-7c5fb9d798         1         1         1       117m
+[status]
+[status] NAME                                                                    READY   AGE
+[status] statefulset.apps/alertmanager-prometheus-kube-prometheus-alertmanager   1/1     116m
+[status] statefulset.apps/prometheus-prometheus-kube-prometheus-prometheus       1/1     116m
+```
 
 ---

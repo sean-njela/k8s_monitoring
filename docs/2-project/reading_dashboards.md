@@ -1,10 +1,10 @@
-# 🧾 DevOps Dashboard Cheat Sheet
+# DevOps Dashboard Cheat Sheet
 
 **How to read dashboards & diagnose issues like a pro**
 
 ---
 
-## 🧩 The Big Picture — Why Dashboards Matter
+## The Big Picture — Why Dashboards Matter
 
 Dashboards are not just “pretty graphs” — they answer **3 core questions**:
 
@@ -12,12 +12,13 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
 2. **Is it fast?** → performance (is it responsive?)
 3. **Is it healthy?** → resource health (can it stay running?)
 
-👉 Always think in terms of **symptoms → cause**.
-For example: *“Website is slow” (symptom) → “database CPU 100%” (cause).*
+!!!tip
+    Always think in terms of **symptoms → cause**.
+    For example: *“Website is slow” (symptom) → “database CPU 100%” (cause).*
 
 ---
 
-## 🟢 Core Areas to Monitor
+## Core Areas to Monitor
 
 ### 1. **CPU**
 
@@ -182,7 +183,7 @@ For example: *“Website is slow” (symptom) → “database CPU 100%” (cause
 
 ---
 
-## 🚨 Diagnosis by Symptom
+## Diagnosis by Symptom
 
 | Symptom                  | Likely Cause                                      | Where to Look                   |
 | ------------------------ | ------------------------------------------------- | ------------------------------- |
@@ -195,7 +196,7 @@ For example: *“Website is slow” (symptom) → “database CPU 100%” (cause
 
 ---
 
-## 🛠️ Method: How to Read a Dashboard Like a Pro
+## Method: How to Read a Dashboard Like a Pro
 
 1. **Start broad → drill down**
 
@@ -214,7 +215,7 @@ For example: *“Website is slow” (symptom) → “database CPU 100%” (cause
 
 ---
 
-## 🎯 World-Class Habits
+## World-Class Habits
 
 * Always correlate **metrics + logs**.
 * Watch **rate of change**, not just absolute numbers (e.g., 10GB logs written/hour).
@@ -223,7 +224,7 @@ For example: *“Website is slow” (symptom) → “database CPU 100%” (cause
 
 ---
 
-## 🔑 TL;DR Cheatsheet
+## TL;DR Cheatsheet
 
 * **CPU >90% sustained** → bottleneck.
 * **Memory + swap high** → thrashing.
@@ -236,7 +237,7 @@ For example: *“Website is slow” (symptom) → “database CPU 100%” (cause
 
 ---
 
-## 🧭 Troubleshooting Flow — From Alert → Root Cause
+## Troubleshooting Flow — From Alert → Root Cause
 
 ```mermaid
 flowchart TD
@@ -287,7 +288,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 🧩 How to Use This Flow
+## How to Use This Flow
 
 1. **Start at the Symptom**
 
@@ -308,7 +309,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 📊 Key Dashboards to Check Along the Way
+## Key Dashboards to Check Along the Way
 
 | Step          | Dashboard / Metric                       | What It Tells You                |
 | ------------- | ---------------------------------------- | -------------------------------- |
@@ -324,7 +325,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 🛠️ Example Walkthroughs with Flow
+## Example Walkthroughs with Flow
 
 ### Example 1: Slow Website
 
@@ -353,7 +354,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-# 🎯 DevOps Mindset
+# DevOps Mindset
 
 * Always think in **layers**:
   **User → Load Balancer → App → DB → OS → Hardware/Network**.
@@ -363,9 +364,9 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 🛠️ Troubleshooting Examples with Dashboards
+## Troubleshooting Examples with Dashboards
 
-## 🔥 Scenario 1: Website is Slow (High Latency)
+## Scenario 1: Website is Slow (High Latency)
 
 ### Symptom:
 
@@ -400,7 +401,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 🔥 Scenario 2: High Error Rate (HTTP 500s)
+## Scenario 2: High Error Rate (HTTP 500s)
 
 ### Symptom:
 
@@ -432,7 +433,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 🔥 Scenario 3: Container Keeps Restarting
+## Scenario 3: Container Keeps Restarting
 
 ### Symptom:
 
@@ -463,7 +464,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 🔥 Scenario 4: Disk Full
+## Scenario 4: Disk Full
 
 ### Symptom:
 
@@ -494,7 +495,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 🔥 Scenario 5: Network Latency Spikes
+## Scenario 5: Network Latency Spikes
 
 ### Symptom:
 
@@ -523,7 +524,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 🔥 Scenario 6: Prometheus Missing Metrics
+## Scenario 6: Prometheus Missing Metrics
 
 ### Symptom:
 
@@ -553,7 +554,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-## 📊 Quick Troubleshooting Playbook
+## Quick Troubleshooting Playbook
 
 | Symptom            | Where to Look             | Common Causes                                    | Actions                                |
 | ------------------ | ------------------------- | ------------------------------------------------ | -------------------------------------- |
@@ -566,7 +567,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ---
 
-✅ With this playbook:
+With this playbook:
 
 * Start at **symptom** (latency, errors, restarts).
 * Drill into **dashboards** (CPU/mem/disk/net/app).

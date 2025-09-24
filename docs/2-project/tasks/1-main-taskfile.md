@@ -1,11 +1,10 @@
-
-# 🧰 Main Taskfile Overview
+# Main Taskfile Overview
 
 This section describes the purpose and layout of the main `Taskfile.yml` used in this project. The Taskfile defines automation tasks to simplify development workflows and ensure consistency across environments.
 
 ---
 
-## ⚙️ Purpose of This Taskfile
+## Purpose of This Taskfile
 
 This Taskfile provides command-line shortcuts for tasks like:
 
@@ -23,7 +22,7 @@ task <task-name>
 
 ---
 
-## 🧱 Core Sections
+## Core Sections
 
 ### 1. **Setup & Initialization**
 
@@ -67,7 +66,7 @@ Includes safe commands to:
 
 ---
 
-## 🧪 Typical Usage Flow
+## Typical Usage Flow
 
 A typical flow using this Taskfile might look like:
 
@@ -97,7 +96,7 @@ A typical flow using this Taskfile might look like:
 
 ---
 
-## 📝 Notes
+## Notes
 
 * To list all available tasks:
 
@@ -115,7 +114,7 @@ A typical flow using this Taskfile might look like:
 
 ---
 
-## 📝 Tips
+## Tips
 
 | Key | Description |
 | --- | --- |
@@ -129,7 +128,7 @@ A typical flow using this Taskfile might look like:
 | requires: | enforce required input variables. |
 | status: | skip tasks if outputs already exist. |
 
-## 🔗 Related Docs
+## Related Docs
 
 * [GitFlow Taskfile](./2-gitflow-taskfile.md)
 * [Getting Started](../../0-quickstart/1-getting-started.md)
@@ -137,7 +136,7 @@ A typical flow using this Taskfile might look like:
 
 ---
 
-## 📬 Contact
+## Contact
 
 For issues or suggestions related to automation and task structure, open an issue or contact the maintainer at [seannjela@outlook.com](mailto:seannjela@outlook.com).
 

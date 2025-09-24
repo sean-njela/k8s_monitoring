@@ -1,10 +1,10 @@
-# 🧱 Kubernetes Monitoring Architecture Overview
+# Kubernetes Monitoring Architecture Overview
 
 This section provides a **high-level overview of the monitoring and observability stack for Kubernetes**. It highlights the **core components**, their responsibilities, and how they work together to deliver **end-to-end monitoring, alerting, and visualization** for clusters and workloads.
 
 ---
 
-## 📐 Design Philosophy
+## Design Philosophy
 
 Our Kubernetes monitoring stack follows these principles:
 
@@ -16,7 +16,7 @@ Our Kubernetes monitoring stack follows these principles:
 
 ---
 
-## 🧩 Core Components
+## Core Components
 
 ### 1. Metrics Collection (Exporters & Kube-State-Metrics)
 
@@ -46,7 +46,7 @@ Our Kubernetes monitoring stack follows these principles:
 
 ---
 
-## 🔀 Kubernetes Monitoring Architecture Diagram
+## Kubernetes Monitoring Architecture Diagram
 
 ```mermaid
 flowchart TD
@@ -77,7 +77,7 @@ flowchart TD
 
 ---
 
-## 🔄 Data / Control Flow
+## Data / Control Flow
 
 1. **Pods and nodes** run applications and workloads.
 2. **kubelet/cAdvisor** collect container and pod-level metrics.
@@ -92,7 +92,7 @@ flowchart TD
 
 ---
 
-## 🧭 Related Pages
+## Related Pages
 
 * [Quickstart: Getting Started](../0-quickstart/1-getting-started.md)
 * [Prometheus Notes](../2-project/prometheus.md)
