@@ -1,4 +1,4 @@
-# 📦 What is Helm?
+# What is Helm?
 
 Helm is the **package manager for Kubernetes**.
 It manages **charts**, which are preconfigured collections of Kubernetes manifests.
@@ -9,7 +9,7 @@ Helm makes installing, upgrading, rolling back, and managing complex Kubernetes 
 
 ---
 
-## 🧐 Why Use Helm?
+## Why Use Helm?
 
 Kubernetes manifests are verbose and repetitive. Managing large apps by hand is error-prone. Helm provides:
 
@@ -19,11 +19,11 @@ Kubernetes manifests are verbose and repetitive. Managing large apps by hand is 
 * **Configuration**: Use `values.yaml` to override defaults.
 * **Repositories**: Share charts publicly or privately.
 
-👉 Helm = apt/yum/homebrew, but for Kubernetes.
+Helm = apt/yum/homebrew, but for Kubernetes.
 
 ---
 
-## 🔧 Helm Architecture
+## Helm Architecture
 
 ```text
    +-------------+
@@ -45,7 +45,7 @@ Kubernetes manifests are verbose and repetitive. Managing large apps by hand is 
 
 ---
 
-## 📝 Core Concepts
+## Core Concepts
 
 | Term           | Meaning                                                         |
 | -------------- | --------------------------------------------------------------- |
@@ -56,7 +56,7 @@ Kubernetes manifests are verbose and repetitive. Managing large apps by hand is 
 
 ---
 
-## 🚀 Basic Commands
+## Basic Commands
 
 ### Install a chart
 
@@ -90,7 +90,7 @@ helm uninstall <release-name> -n <namespace>
 
 ---
 
-## 📊 Managing Deployments After Install
+## Managing Deployments After Install
 
 1. **Scale workloads to zero (stop running without deletion)**
 
@@ -117,7 +117,7 @@ helm upgrade <release-name> <chart> -f values.yaml -n <namespace>
 
 ---
 
-## ⚙️ Helm Chart Structure
+## Helm Chart Structure
 
 ```text
 mychart/
@@ -130,7 +130,7 @@ mychart/
 
 ---
 
-## 🔍 Helm Values
+## Helm Values
 
 Values control how templates render.
 
@@ -154,7 +154,7 @@ helm install myapp ./mychart --set replicaCount=3 --set image.tag=1.26
 
 ---
 
-## 🛠 Template Language
+## Template Language
 
 Helm templates use **Go templating**.
 
@@ -176,9 +176,9 @@ spec:
 
 ---
 
-## 🧾 Helm Cheat Sheet
+## Helm Cheat Sheet
 
-### ✅ Core Operations
+### Core Operations
 
 | Task         | Command                                                 |
 | ------------ | ------------------------------------------------------- |
@@ -191,7 +191,7 @@ spec:
 
 ---
 
-### 🔧 Chart Dev Commands
+### Chart Dev Commands
 
 | Task            | Command                            |
 | --------------- | ---------------------------------- |
@@ -203,7 +203,7 @@ spec:
 
 ---
 
-### 🛡️ Security Notes
+### Security Notes
 
 * Do not store plaintext secrets in `values.yaml`. Use **Sealed Secrets** or **External Secrets Operator**.
 * Restrict Tiller (Helm v2 only, obsolete). Helm v3 does not need server-side components.
@@ -211,7 +211,7 @@ spec:
 
 ---
 
-### ⚠️ Risks & Trade-offs
+### Risks & Trade-offs
 
 * **Scaling to zero via kubectl** → Helm unaware, overwritten on next upgrade.
 * **Editing values.yaml** → More controlled, but requires upgrade.
@@ -554,3 +554,5 @@ Commands index and plugin guide.
 
 * `kubectl scale` changes drift from Helm state. Persist intent in values where possible.
 * `--force` replaces resources and can briefly delete and recreate objects. Use with caution.
+
+---

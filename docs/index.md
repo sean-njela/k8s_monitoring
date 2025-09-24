@@ -1,4 +1,4 @@
-# 🚀 Monitoring Kubernetes with Prometheus — A Personal Project
+# Monitoring Kubernetes with Prometheus — A Personal Project
 
 Welcome to my **Prometheus on Kubernetes documentation project** — a personal initiative to showcase deep expertise in **monitoring, observability, and cloud-native systems at scale**.
 
@@ -7,27 +7,27 @@ It is designed for **engineers, SREs, and learners** who want to understand Kube
 
 ---
 
-## 🎯 Project Purpose
+## Project Purpose
 
-* ✅ Demonstrate **expert knowledge** in Prometheus, Kubernetes, and cloud-native observability.
-* 📚 Provide a **world-class learning resource** tailored to Kubernetes users, assuming no prior experience.
-* 🧑‍💼 Serve as a **portfolio piece** highlighting my skills in **technical writing, system design, and DevOps practices**.
+* Demonstrate **expert knowledge** in Prometheus, Kubernetes, and cloud-native observability.
+* Provide a **world-class learning resource** tailored to Kubernetes users, assuming no prior experience.
+* Serve as a **portfolio piece** highlighting my skills in **technical writing, system design, and DevOps practices**.
 
 ---
 
-## 🧭 Quick Overview of Prometheus on Kubernetes
+## Quick Overview of Prometheus on Kubernetes
 
 Prometheus is the **de-facto monitoring and alerting toolkit** in Kubernetes that:
 
-* 🔧 Collects metrics from **nodes, pods, and services** via service discovery.
-* 📊 Stores them in a purpose-built **time-series database (TSDB)**.
-* 🔍 Uses **PromQL** to query cluster and application metrics.
-* 🔔 Sends alerts via **Alertmanager**.
-* ⚡ Integrates seamlessly with **Grafana** for dashboards.
+* Collects metrics from **nodes, pods, and services** via service discovery.
+* Stores them in a purpose-built **time-series database (TSDB)**.
+* Uses **PromQL** to query cluster and application metrics.
+* Sends alerts via **Alertmanager**.
+* Integrates seamlessly with **Grafana** for dashboards.
 
 ---
 
-## ⚡ Getting Started
+## Getting Started
 
 Jump into the **[Quick Start](0-quickstart/1-getting-started.md)** guide to see Kubernetes monitoring in action:
 
@@ -39,7 +39,7 @@ Jump into the **[Quick Start](0-quickstart/1-getting-started.md)** guide to see 
 
 ---
 
-## 📐 Architecture & Components
+## Architecture & Components
 
 This project explains Kubernetes monitoring from the ground up:
 
@@ -53,7 +53,7 @@ See detailed workflows in **[Architecture](1-architecture/0-overview.md)**.
 
 ---
 
-## 📚 Documentation Roadmap
+## Documentation Roadmap
 
 The guide follows a **step-by-step learning path**:
 
@@ -65,29 +65,29 @@ The guide follows a **step-by-step learning path**:
 
 ---
 
-## 🧪 Example Use Cases
+## Example Use Cases
 
 Prometheus in Kubernetes enables:
 
-* 🖥️ **Cluster Monitoring** → Node health, kubelet, API server, etcd.
-* 📦 **Workload Monitoring** → Pod metrics, deployments, HPA scaling signals.
-* 🛠️ **Application Monitoring** → Service SLIs, latency, error rates, traffic.
-* 🔔 **Alerting** → Node pressure, pod crashes, SLA breaches, anomalies.
+* **Cluster Monitoring** → Node health, kubelet, API server, etcd.
+* **Workload Monitoring** → Pod metrics, deployments, HPA scaling signals.
+* **Application Monitoring** → Service SLIs, latency, error rates, traffic.
+* **Alerting** → Node pressure, pod crashes, SLA breaches, anomalies.
 
 All use cases are illustrated with **hands-on Kubernetes demos**.
 
 ---
 
-## 🔗 Useful Links
+## Useful Links
 
-* ⚡ [Getting Started](0-quickstart/1-getting-started.md)
-* 📊 [System Architecture](1-architecture/0-overview.md)
-* 📝 [PromQL & Features](2-project/prometheus.md)
-* 🧑‍💼 [About Me](4-about/0-about.md)
+* [Getting Started](0-quickstart/1-getting-started.md)
+* [System Architecture](1-architecture/0-overview.md)
+* [PromQL & Features](2-project/prometheus.md)
+* [About Me](4-about/0-about.md)
 
 ---
 
-## 💡 About This Project
+## About This Project
 
 This documentation is a **personal showcase of Kubernetes monitoring expertise**.
 It combines:

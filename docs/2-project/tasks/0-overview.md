@@ -21,7 +21,7 @@ For detailed details about taskfile use:
 
 ---
 
-## 📬 Contact
+## Contact
 
 Questions or issues with GitFlow setup? Reach out via [GitHub Issues](https://github.com/your-username/your-repo/issues) or email at [your.email@example.com](mailto:your.email@example.com).
 

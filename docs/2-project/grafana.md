@@ -1,17 +1,17 @@
 # Grafana
 
-## 📊 What is Grafana?
+## What is Grafana?
 
 Grafana is an **open-source observability and visualization platform**.
-It lets you **query, visualize, alert, and explore** metrics, logs, and traces from multiple data sources.
+It lets you **query, visualise, alert, and explore** metrics, logs, and traces from multiple data sources.
 
 Originally created by Torkel Ödegaard, Grafana has grown into a **CNCF incubating project** and is now the **de facto dashboarding tool** in cloud-native monitoring stacks.
 
-👉 If Prometheus is the “brain” of monitoring (data collection & querying), Grafana is the **eyes** (dashboards & visualizations).
+If Prometheus is the “brain” of monitoring (data collection & querying), Grafana is the **eyes** (dashboards & visualisations).
 
 ---
 
-## 🧐 Why Do We Need Grafana?
+## Why Do We Need Grafana?
 
 Modern systems generate **huge amounts of telemetry data**:
 
@@ -19,30 +19,30 @@ Modern systems generate **huge amounts of telemetry data**:
 * **Logs** (from Loki, Elasticsearch, Splunk, etc.)
 * **Traces** (from Jaeger, Tempo, Zipkin, etc.)
 
-Without **visualization**, raw metrics are hard to interpret.
+Without **visualisation**, raw metrics are hard to interpret.
 Grafana solves this by:
 
 * Turning metrics into **interactive dashboards**
 * Providing **alerting** when thresholds are crossed
 * Enabling **multi-source observability** (metrics + logs + traces in one UI)
 
-👉 Grafana = **single pane of glass for observability**.
+Grafana = **single pane of glass for observability**.
 
 ---
 
-## 🔧 How Grafana Works
+## How Grafana Works
 
 Grafana itself does **not collect data**. Instead, it:
 
 1. Connects to **data sources** (Prometheus, Loki, Elasticsearch, etc.)
 2. Executes queries against them
 3. Renders results in **panels** (graphs, gauges, tables, heatmaps, etc.)
-4. Organizes panels into **dashboards**
+4. Organises panels into **dashboards**
 5. Provides **alerting & notifications** based on panel queries
 
 ---
 
-### 🔗 Architecture Overview
+### Architecture Overview
 
 ```text
 +------------------+
@@ -57,16 +57,16 @@ Grafana itself does **not collect data**. Instead, it:
 |  - Alerting       |
 +---------+---------+
           |
-   +------+------+
-   | Dashboards |
-   +------+------+
+   +------+------+  
+   | Dashboards |  
+   +------+------+  
           |
       End Users
 ```
 
 ---
 
-## 🔄 Data Flow: From Metrics → Grafana → User
+## Data Flow: From Metrics → Grafana → User
 
 ```mermaid
 sequenceDiagram
@@ -83,9 +83,9 @@ sequenceDiagram
 
 ---
 
-## 📊 Example Grafana Panels
+## Example Grafana Panels
 
-Grafana supports **many visualization types**:
+Grafana supports **many visualisation types**:
 
 * **Time series graph** → CPU usage over time
 * **Gauge / SingleStat** → current memory usage
@@ -93,27 +93,27 @@ Grafana supports **many visualization types**:
 * **Table** → list of failing pods
 * **Pie chart** → % of requests per region
 
-👉 Panels can be grouped into **dashboards** (e.g., “Kubernetes Cluster Health”).
+Panels can be grouped into **dashboards** (e.g., “Kubernetes Cluster Health”).
 
 ---
 
-## 🛠 Common Data Sources
+## Common Data Sources
 
 Grafana supports **dozens of backends**. Most common:
 
 | Type          | Example                                       | Purpose                 |
 | ------------- | --------------------------------------------- | ----------------------- |
 | **Metrics**   | Prometheus, InfluxDB, Graphite                | Time-series metrics     |
-| **Logs**      | Loki, Elasticsearch, Splunk                   | Centralized logging     |
+| **Logs**      | Loki, Elasticsearch, Splunk                   | Centralised logging     |
 | **Traces**    | Tempo, Jaeger, Zipkin                         | Distributed tracing     |
 | **Databases** | MySQL, PostgreSQL                             | Custom queries          |
 | **Cloud**     | AWS CloudWatch, GCP Monitoring, Azure Monitor | Cloud-native monitoring |
 
-👉 Grafana turns it into a **multi-source observability platform**.
+Grafana turns it into a **multi-source observability platform**.
 
 ---
 
-## 🔔 Alerting in Grafana
+## Alerting in Grafana
 
 Grafana provides a **unified alerting system** (since v8):
 
@@ -136,7 +136,7 @@ Grafana provides a **unified alerting system** (since v8):
 
 ---
 
-## ⚙️ Installing Grafana
+## Installing Grafana
 
 ### Docker
 
@@ -156,37 +156,37 @@ helm install grafana grafana/grafana
 
 ---
 
-## 🛡️ Security Best Practices
+## Security Best Practices
 
-* ✅ Always set **admin password** (default is insecure).
-* ✅ Enable **TLS** if exposed publicly.
-* ✅ Use **OAuth/SAML/LDAP** for authentication.
-* ✅ Use **folders & permissions** to restrict dashboard access.
-* ✅ Enable **audit logs** for compliance.
-
----
-
-## 🔍 Key Strengths of Grafana
-
-* 🌐 **Multi-data-source** (metrics, logs, traces, SQL, cloud).
-* 🎨 **Rich visualizations** (100+ panel types, plugins).
-* 📦 **Pre-built dashboards** (Grafana.com library).
-* ⚡ **Fast querying & exploration** (great with Prometheus).
-* 📢 **Unified alerting** with many integrations.
-* 🔌 **Extensible** (plugins for panels, datasources, apps).
+* Always set **admin password** (default is insecure).
+* Enable **TLS** if exposed publicly.
+* Use **OAuth/SAML/LDAP** for authentication.
+* Use **folders & permissions** to restrict dashboard access.
+* Enable **audit logs** for compliance.
 
 ---
 
-## ⚠️ Limitations & Watch Outs
+## Key Strengths of Grafana
 
-* ❌ **No storage** → relies on external data sources.
-* ❌ **Query-heavy dashboards** → can overload Prometheus/DB.
-* ❌ **High availability setup** requires external DB (MySQL/Postgres).
-* ❌ **User management** is limited in OSS (Grafana Enterprise adds RBAC, reporting).
+* **Multi-data-source** (metrics, logs, traces, SQL, cloud).
+* **Rich visualisations** (100+ panel types, plugins).
+* **Pre-built dashboards** (Grafana.com library).
+* **Fast querying & exploration** (great with Prometheus).
+* **Unified alerting** with many integrations.
+* **Extensible** (plugins for panels, datasources, apps).
 
 ---
 
-## 📦 Grafana in the Observability Stack
+## Limitations & Watch Outs
+
+* **No storage** → relies on external data sources.
+* **Query-heavy dashboards** → can overload Prometheus/DB.
+* **High availability setup** requires external DB (MySQL/Postgres).
+* **User management** is limited in OSS (Grafana Enterprise adds RBAC, reporting).
+
+---
+
+## Grafana in the Observability Stack
 
 ```mermaid
 flowchart TD
@@ -214,26 +214,26 @@ flowchart TD
     T --> G
 ```
 
-👉 Grafana = **central observability frontend** for metrics, logs, and traces.
+Grafana = **central observability frontend** for metrics, logs, and traces.
 
 ---
 
-## 🧾 Grafana Cheat Sheet
+## Grafana Cheat Sheet
 
-### ✅ Core Concepts
+### Core Concepts
 
 | Term             | Meaning                                                 |
 | ---------------- | ------------------------------------------------------- |
 | **Data source**  | External system providing data (Prometheus, Loki, etc.) |
-| **Panel**        | Single visualization (graph, table, etc.)               |
+| **Panel**        | Single visualisation (graph, table, etc.)               |
 | **Dashboard**    | Collection of panels                                    |
 | **Alert**        | Rule based on a query, triggers notification            |
-| **Organization** | Multi-tenant separation in Grafana                      |
+| **Organisation** | Multi-tenant separation in Grafana                      |
 | **Folder**       | Logical grouping of dashboards                          |
 
 ---
 
-### 📊 Common Use Cases
+### Common Use Cases
 
 * **System monitoring** (CPU, memory, disk usage).
 * **Kubernetes monitoring** (pods, nodes, namespaces).
@@ -243,14 +243,14 @@ flowchart TD
 
 ---
 
-## 🎯 Final Takeaway
+## Final Takeaway
 
 Grafana is:
 
-* The **visualization + alerting layer** of modern monitoring stacks.
+* The **visualisation + alerting layer** of modern monitoring stacks.
 * **Datasource-agnostic** (works with metrics, logs, traces, SQL).
 * **Essential** for Kubernetes, microservices, and cloud-native setups.
 
-👉 Think of Grafana as the **dashboard and control room** where DevOps, SREs, and engineers get their insights.
+Think of Grafana as the **dashboard and control room** where DevOps, SREs, and engineers get their insights.
 
 ---
