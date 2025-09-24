@@ -17,10 +17,10 @@ After everything is wired up, you can run the following commands:
 ```bash
 task setup
 
-task dev
+task status # check if everything is running
 
 # GIVE EVERYTHING A MINUTE TO SETUP THEN
-task status # check if everything is running
+task dev
 ```
 
 This will start the devbox environment and poetry environment and install all dependencies. And that is all you need to do to get started. (Yes, really.)
