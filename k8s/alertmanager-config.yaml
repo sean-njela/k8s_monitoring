@@ -8,7 +8,7 @@ metadata:
     # The "release" label must match the Prometheus Operator's Helm release name
     # or the Alertmanager instance's label selector. This ensures the Operator
     # discovers and applies this configuration to the correct Alertmanager cluster.
-    release: prometheus
+    resource: prometheus
     # Arbitrary label used for grouping and filtering resources.
     app: prometheus
 
@@ -22,18 +22,36 @@ spec:
     groupWait: 30s
     # "groupInterval" (note: case-sensitive, must be `groupInterval` not `groupinterval`)
     # defines the minimum time between notifications for the same alert group.
-    # Here it is set to 5 minutes.
-    groupInterval: 5m
+    # Here it is set to 1 minute.
+    groupInterval: 1m
     # "repeatInterval" is how often a notification is re-sent if the alert is still firing.
     # Here, every 12 hours a reminder is sent until the alert resolves.
     repeatInterval: 12h
     # "receiver" specifies the default receiver to which grouped alerts are sent.
     # Must match a receiver defined under "receivers" below.
-    receiver: "webhook"
+    # receiver: "webhook"
+    receiver: "slack"
 
   receivers:
     # Receivers define the actual integrations that handle alerts (e.g. email, Slack, webhook).
-    - name: "webhook"  # Must match the route.receiver field above.
-      webhookConfigs:
-        # Each webhookConfig defines a webhook endpoint for delivering alerts.
-        - url: "http://example.com"  # Replace with an actual webhook listener endpoint.
+    - name: "slack"  # Must match the route.receiver field above.
+      slackConfigs:
+        # Each slackConfig defines a webhook endpoint for delivering alerts.
+        - apiURL: # Upercase URL !!
+            name: slack-webhook-secret
+            key: webhook-url
+          channel: "#alert-manager"
+          sendResolved: true
+          text: |-
+            {{ range .Alerts }}
+            <!channel> {{ .Annotations.summary }}
+            {{ .Annotations.description }}
+            {{ end }}
+
+
+  # receivers:
+  #   # Receivers define the actual integrations that handle alerts (e.g. email, Slack, webhook).
+  #   - name: "webhook"  # Must match the route.receiver field above.
+  #     webhookConfigs:
+  #       # Each webhookConfig defines a webhook endpoint for delivering alerts.
+  #       - url: "www.example.com"  # Replace with an actual webhook listener endpoint.

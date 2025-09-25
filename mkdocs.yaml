@@ -157,6 +157,7 @@ nav:
       - Alertmanager: 2-project/alertmanager.md
       - Portainer: 2-project/portainer.md
       - Helm: 2-project/helm.md
+      - General Notes: 2-project/notes.md
       - Setup: 2-project/setup.md
       - How to Read Dashboards: 2-project/reading_dashboards.md
       # etc.

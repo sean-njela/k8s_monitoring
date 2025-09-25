@@ -1,143 +1,180 @@
-# Main Taskfile Overview
+# Taskfile Documentation
 
-This section describes the purpose and layout of the main `Taskfile.yml` used in this project. The Taskfile defines automation tasks to simplify development workflows and ensure consistency across environments.
+This document explains the structure, conventions, and usage of the main [`Taskfile.yml`](../../Taskfile.yml). It serves as the primary automation entrypoint for development, deployment, monitoring, and utility workflows in this project.
 
----
+## Purpose
 
-## Purpose of This Taskfile
+The Taskfile provides a consistent command-line interface for common project operations. It eliminates the need to memorise long `kubectl`, `helm`, or `docker` commands, ensures reproducibility, and encodes conventions (naming, namespaces, repo URLs, etc.) in a single place.
 
-This Taskfile provides command-line shortcuts for tasks like:
-
-- Project setup
-- Development environment bootstrapping
-- Application deployment
-- Local documentation serving
-- Cleanup and teardown
-
-It abstracts repetitive shell commands into named tasks you can run with:
+All tasks can be executed with:
 
 ```bash
 task <task-name>
 ```
 
----
+## Global Configuration
 
-## Core Sections
+### Version
 
-### 1. **Setup & Initialization**
+The Taskfile uses **version 3** syntax.
 
-Includes tasks for:
+### Output
 
-* Installing dependencies
-* Setting up local development tools
-* Generating keys or configs (if applicable)
+```yaml
+output: prefixed
+```
 
-### 2. **Development Workflow**
+Logs are prefixed with task names to make parallel output easier to follow.
 
-Common tasks for:
+### Environment
 
-* Starting local services or dev containers
-* Running dev servers
-* Applying Kubernetes configs or local manifests
-* Watching for file changes
+* `.env` and `.env.local` files are automatically loaded.
+* Global environment variables (`ENV`, `DEBUG`) can be overridden per-task.
 
-### 3. **Documentation**
+### Variables
 
-Tasks to:
+Several key variables are declared for reuse across tasks:
 
-* Serve documentation locally (e.g., MkDocs)
-* Build or deploy docs (if using GitHub Pages or mike)
+* **Cluster and namespace:**
 
-### 4. **Deployment & Automation**
+  * `KIND_CLUSTER_NAME`: Kind cluster name
+  * `DEV_CLUSTER`: Development cluster logical name
+  * `DEV_NS`: Kubernetes namespace for monitoring
 
-Tasks may automate:
+* **Services & ports:**
 
-* Building and pushing Docker images
-* Running linters or formatters
-* Applying infrastructure changes (e.g., with Terraform)
+  * `PROM_SVC`, `GRAF_SVC`, `APP_SVC`, `ALERTM_SVC`
+  * `PROM_PORT`, `APP_PORT`, `ALERTM_PORT`, `GRAF_PORT`
 
-### 5. **Cleanup & Teardown**
+* **Helm:**
 
-Includes safe commands to:
+  * `HELM_REPO_URL`, `HELM_CHART_NAME`, `CUSTOM_HELM_REPO_NAME`, `CUSTOM_HELM_CHART_NAME`
+  * Values files for Helm (`FINAL_HELM_VALUES_FILE`, `READ_HELM_VALUES_FILE`)
 
-* Tear down local clusters or containers
-* Remove generated files or environments
-* Reset state for fresh runs
+* **Metadata:**
 
----
+  * `PROJECT_NAME`, `TIMESTAMP` (dynamic), and app Docker image name.
 
-## Typical Usage Flow
+This ensures **one change in variables propagates everywhere** (DRY principle).
 
-A typical flow using this Taskfile might look like:
+## Includes
 
-* Set up your environment:
+```yaml
+includes:
+  common:
+    taskfile: ./Taskfile.gitflow.yaml
+    flatten: true
+```
+
+A shared GitFlow Taskfile is included, so git-related automation is accessible directly without namespace prefixes.
+
+## Core Tasks
+
+### Default
+
+Lists all tasks:
+
+```bash
+task
+```
+
+### Setup & Development
+
+* **`setup`**: Creates cluster, loads images, installs Prometheus via Helm, and deploys the app.
+* **`dev`**: Starts development services, retrieves Grafana credentials, and forwards ports.
+* **`create-cluster-dev`**: Creates Kind cluster, switches context, creates namespace, and sets it active.
+* **`prod`**: Placeholder for production deployment pipeline.
+
+### Monitoring & Observability
+
+* **`helm-install-prom`**: Adds Helm repo, installs Prometheus/Grafana/Alertmanager stack, saves chart values.
+
+* **`helm-upgrade-prom`**: Upgrades the stack with current values.
+
+* **`prom-helm-values`**: Dumps Helm chart values for inspection.
+
+* **Port forward tasks:**
+
+  * `port-fwd-prom`, `port-fwd-app`, `port-fwd-alertm`, `port-fwd-graf`
+
+* **`get-graf-passwd`**: Fetches Grafana admin password from Kubernetes secret.
+
+### Application Deployment
+
+* **`deploy-app`**: First-time creation of manifests from `k8s/`.
+* **`apply-app`**: Applies updates to manifests.
+* **`delete-app`**: Removes app resources.
+
+### System & Info
+
+* **`ports`**: Lists open ports.
+* **`info`**: Prints key service URLs.
+* **`status`**: Runs `kubectl get all` in the namespace.
+* **`versions`**: Uses `mike list` to check docs versions.
+
+### Cleanup
+
+* **`cleanup-dev`**: Tears down only development stack (Helm release, Kind cluster, k8s resources, repo references, images). Designed to fail gracefully if resources are missing.
+* **`cleanup-prod`**: Placeholder for production cleanup.
+* **`cleanup-all`**: Invokes both dev and prod cleanup.
+
+### Utilities
+
+#### Kind
+
+* **`kind-load-images`**: Ensures application image is pulled locally and loaded into Kind cluster (faster than registry pulls).
+
+#### Documentation
+
+* **`docs`**: Runs `mkdocs serve` via Poetry, serving docs at [http://127.0.0.1:8000/docs/](http://127.0.0.1:8000/docs/).
+
+#### Compression
+
+* **`compress`**: Downscales and compresses MP4 to `assets/demo-video-small.mp4`. Supports runtime overrides (`crf`, `preset`).
+* **`compress-gif`**: Optimises and compresses GIFs into `assets/demo-video-small.gif`. Generates and applies a palette for quality.
+* **`mkdir-assets`**: Ensures `assets/` directory exists on Linux/macOS or Windows before compression tasks.
+
+## Workflow Examples
+
+1. **Bootstrap monitoring stack:**
 
    ```bash
    task setup
    ```
 
-* Start development:
+2. **Iterate locally:**
 
    ```bash
    task dev
    ```
 
-* Serve documentation:
+3. **View monitoring endpoints:**
 
    ```bash
-   task docs
+   task info
    ```
 
-* Clean up:
+4. **Tear down environment:**
 
    ```bash
-   task cleanup
+   task cleanup-dev
    ```
 
----
+## Design Conventions
 
-## Notes
+* **Fail gracefully**: Tasks often use `|| echo "error ..."` to avoid halting entire pipelines.
+* **Idempotency**: Many tasks can be rerun without harm (e.g., `kubectl create namespace`).
+* **Cross-platform**: Some tasks (`mkdir-assets`) include OS-specific logic.
+* **Separation of concerns**: App vs. infra vs. docs tasks are grouped logically.
+* **DRY configuration**: Variables centralise cluster, service, and chart settings.
 
-* To list all available tasks:
+## Notes & Recommendations
+
+* To check all available tasks:
 
   ```bash
   task --list-all
   ```
-
-* Variables and flags can be passed to tasks like so:
-
-  ```bash
-  task my-task <var>=<value>
-  ```
-
-* You can structure task dependencies using `deps:` and reuse shell logic cleanly across environments.
-
----
-
-## Tips
-
-| Key | Description |
-| --- | --- |
-| dotenv + env: | auto-load .env files and allow task-specific overrides. |
-| vars: | static or dynamic variables (via shell) for templated substitution. |
-| prompt: | even for setup or prod, ask user before proceeding. |
-| preconditions: | enforce environment state before running. |
-| deps: | define ordering (serial) via deps for safety and repeatability. |
-| internal: | hide helper tasks from user listings. |
-| platforms: | restrict tasks to specific OS/arch. |
-| requires: | enforce required input variables. |
-| status: | skip tasks if outputs already exist. |
-
-## Related Docs
-
-* [GitFlow Taskfile](./2-gitflow-taskfile.md)
-* [Getting Started](../../0-quickstart/1-getting-started.md)
-* [Architecture Overview](../../1-architecture/0-overview.md)
-
----
-
-## Contact
-
-For issues or suggestions related to automation and task structure, open an issue or contact the maintainer at [seannjela@outlook.com](mailto:seannjela@outlook.com).
-
----
+* Always verify Helm values files (`k8s/values` vs `k8s/read_values`) before upgrades.
+* Use port-forward tasks only for local debugging. For real environments, prefer ingress or LoadBalancer services.
+* `prod`, `cleanup-prod`, and other stubs are intentionally left for extension in real deployments.

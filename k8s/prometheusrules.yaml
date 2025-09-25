@@ -1,29 +1,79 @@
 apiVersion: monitoring.coreos.com/v1
-
 kind: PrometheusRule
-
 metadata:
   name: prometheus-demo-app-rules
+  namespace: k8s-monitoring-ns
   labels:
-    # The "release" label must match the Prometheus Operator's Helm release name
-    # or the Prometheus instance's label selector. This allows Prometheus to
-    # discover and load this rule.
+    # Must match the Helm release name used for kube-prometheus-stack.
+    # This ensures the Prometheus instance discovers and loads this rule.
     release: prometheus
-    # Arbitrary app label for grouping resources in the namespace
+    # Arbitrary label for grouping resources, not used by Prometheus itself.
     app: prometheus
-
 spec:
   groups:
-    # Each group is a logical collection of rules evaluated together.
-    - name: prometheus-demo-app   # Name of the rule group
+    # =====================================================================
+    # GROUP 1: Health rules for the prometheus-demo-app deployment
+    # =====================================================================
+    - name: prometheus-demo-app
       rules:
-        # Each element under "rules" is one alerting or recording rule.
-        - alert: down  # Alert name. Must be unique within the group.
-          expr: up == 0  # PromQL expression. "up == 0" means target is unreachable.
-          for: 0m        # Duration for which the condition must hold before firing.
+        # --------------------------------------------------------------
+        # RULE 1: Detect when the deployment has no available replicas
+        # --------------------------------------------------------------
+        - alert: DeploymentReplicasMismatch
+          # kube_deployment_status_replicas_available is exposed by kube-state-metrics.
+          # If fewer than 1 replica is available, this indicates the app is down.
+          expr: kube_deployment_status_replicas_available{deployment="prometheus-demo-app"} < 1
+          # Require 1 minute before firing to avoid noise from short restarts.
+          for: 1m
           labels:
-            severity: critical  # Custom label attached to the alert for routing.
+            severity: critical
           annotations:
-            # Human-readable summary shown in alert notifications.
-            summary: Prometheus target missing {{$labels.instance}}
-            # "{{$labels.instance}}" interpolates the failing target's instance label.
+            summary: "Deployment {{ $labels.deployment }} has no available replicas"
+            description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} has 0 replicas available."
+
+        # --------------------------------------------------------------
+        # RULE 2: Detect when Prometheus has no scrape targets for the app
+        # --------------------------------------------------------------
+        - alert: TargetMissing
+          # absent() evaluates true if no series match at all.
+          # If no target with job="prometheus-demo-app" exists, Prometheus cannot scrape it.
+          expr: absent(up{job="prometheus-demo-app-svc"})
+          # Fire immediately, since this means a misconfigured ServiceMonitor or no pods.
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Prometheus scrape target missing for prometheus-demo-app"
+            description: "Prometheus has no scrape targets for prometheus-demo-app in namespace {{ $labels.namespace }}."
+
+        # --------------------------------------------------------------
+        # RULE 3: Detect when a target exists but is down (up == 0)
+        # --------------------------------------------------------------
+        - alert: TargetDown
+          # up == 0 means a target exists but failed scraping (pod crash, network issue).
+          expr: absent(up{job="prometheus-demo-app-svc"})
+          # Give 30 seconds grace to avoid alert flapping.
+          for: 30s
+          labels:
+            severity: warning
+          annotations:
+            summary: "Prometheus target {{ $labels.instance }} is down"
+            description: "Prometheus scrape target for job {{ $labels.job }} on instance {{ $labels.instance }} is down."
+
+    # =====================================================================
+    # GROUP 2: Slack test alert
+    # This is a synthetic rule that always fires, useful for verifying
+    # end-to-end delivery from Prometheus → Alertmanager → Slack.
+    # =====================================================================
+    - name: test.rules
+      rules:
+        - alert: SlackTestAlert
+          # vector(1) always evaluates to true.
+          expr: vector(1)
+          # Wait 30 seconds before firing so it is visible but not instant noise.
+          for: 30s
+          labels:
+            severity: critical
+          annotations:
+            summary: "Slack test alert"
+            description: "This is a synthetic alert to validate Slack integration."

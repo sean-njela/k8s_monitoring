@@ -58,6 +58,7 @@
 
 <div align="center"> 
   <img src="assets/screenshot3.png" alt="screenshot3" height="500" width="1000" />
+  <img src="assets/screenshot4.png" alt="screenshot4" height="500" width="1000" />
   <img src="assets/screenshot1.png" alt="screenshot1" height="500" width="1000" />
   <img src="assets/screenshot2.png" alt="screenshot2" height="500" width="1000" />
 </div>
@@ -158,7 +159,7 @@ Docs available at: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 * Metrics Collection & Visualization – real-time system, application, and container insights
 * Reliability & Scalability – designing a monitoring stack built for production
-* AlertManager
+* AlertManager Alerting & Incident Response – proactive notifications via Slack/Email/PagerDuty
 
 ## Tasks (Automation)
 
@@ -199,7 +200,7 @@ For comprehensive troubleshooting, refer to the [Troubleshooting](docs/3-trouble
 ## Roadmap
 
 * [x] Metrics Collection & Visualization – real-time system, application, and container insights
-* [ ] Alerting & Incident Response – proactive notifications via Slack/Email/PagerDuty
+* [x] Alerting & Incident Response – proactive notifications via Slack/Email/PagerDuty
 * [ ] App instrumentation
 
 ## Contributing
