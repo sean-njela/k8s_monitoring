@@ -341,7 +341,7 @@ in the features, enable an **Incoming Webhook** and select the channel to post t
 If you want to test intergration run the curl command in the UI inside your terminal e.g:
 
 ```bash
-curl -X POST -H 'Content-type: application/json' --data '{"text":"Alert Manager Curl Test!"}' REMOVED<==services/T096B2LBJKY/B09J0BK67MW/wafPqY7CV5c4OHHjZWfPKn2L
+curl -X POST -H 'Content-type: application/json' --data '{"text":"Alert Manager Curl Test!"}' <slack-channel-webhook>
 ```
 
 Take note of the webhook URL.
