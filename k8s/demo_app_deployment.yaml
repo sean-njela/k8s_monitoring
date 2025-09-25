@@ -6,9 +6,10 @@ metadata:
   name: prometheus-demo-app
   labels:
     app: prometheus-demo-app
+    job: prometheus-demo-app
 
 spec:
-  replicas: 2
+  replicas: 1
 
   selector:
     matchLabels:
@@ -22,5 +23,6 @@ spec:
       containers:
       - image: sanjeevkt720/prometheus-demo:latest
         name: prometheus-demo-app
+        imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 3000

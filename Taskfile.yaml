@@ -63,6 +63,7 @@ vars:
   PROM_URL: "Prometheus → http://localhost:9090"
   APP_URL: "Prometheus → http://localhost:3000"
   ALERTM_URL: "Alert Manager → http://localhost:9093"
+  APP_DOCKER_IMAGE: sanjeevkt720/prometheus-demo:latest
   KIND_CLUSTER_NAME: k8s-monitoring-control-plane
   DEV_CLUSTER: k8s-monitoring
   DEV_NS: k8s-monitoring-ns
@@ -105,6 +106,7 @@ tasks:
     desc: "⚙️ Setup environment: install dependencies, generate config etc."
     cmds:
       - task: create-cluster-dev
+      - task: kind-load-images
       - task: helm-install-prom
       - task: deploy-app
 
@@ -248,6 +250,14 @@ tasks:
       - kubens {{.DEV_NS}}
       - kubectl port-forward {{.GRAF_SVC}} {{.GRAF_PORT}}
 
+
+# ─── kind ───────────────────────────────────────────────────────────
+  kind-load-images:
+    desc: "Load images into the cluster to spid up provisioning"
+    cmds:
+      - kubens {{.DEV_NS}} || echo "error switching k8s ns"
+      - docker pull {{.APP_DOCKER_IMAGE}} || echo "error pulling images"
+      - kind load docker-image {{.APP_DOCKER_IMAGE}} --name {{.KIND_CLUSTER_NAME}} || echo "error transferring images"
 
 
   # ─── Cleanup Tasks ───────────────────────────────────────────────────────────
