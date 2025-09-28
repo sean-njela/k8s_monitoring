@@ -27,10 +27,11 @@ You can browse specific problem pages here:
 
 ## Pro Tip
 
-When searching using the search bar above, include the name of the tool or parts of the error message (in quotes if exact), e.g.:
+!!! tip
+    When searching using the search bar above, include the name of the tool or parts of the error message (in quotes if exact), e.g.:
 
-"helm install" or "helm" "chart not found" or "not found"
-"terraform apply" or "terraform" "invalid provider configuration" or "provider not found"
-"kubectl apply" or "kubectl" "namespace not found" or "namespace does not exist"
+    "helm install" or "helm" "chart not found" or "not found"
+    "terraform apply" or "terraform" "invalid provider configuration" or "provider not found"
+    "kubectl apply" or "kubectl" "namespace not found" or "namespace does not exist"
 
 Thank you for your patience and initiative — the more we learn from problems, the better this documentation will become.

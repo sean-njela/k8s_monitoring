@@ -34,11 +34,11 @@ All opinions, techniques, and practices shared here reflect **my personal learni
 
 ## License
 
-This project is licensed under the [MIT](https://github.com/sean-njela/demo_monitoring/blob/main/LICENSE), which permits reuse, modification, and distribution—**with proper attribution**.
+This project is licensed under the [MIT](https://github.com/sean-njela/k8s_monitoring/blob/main/LICENSE), which permits reuse, modification, and distribution—**with proper attribution**.
 
 ## Contact
 
 If you spot issues, risks, or have questions about how something works, feel free to reach out:
 
 - [seannjela@outlook.com](mailto:seannjela@outlook.com)
-- [GitHub Issues](https://github.com/sean-njela/demo_monitoring/issues)
+- [GitHub Issues](https://github.com/sean-njela/k8s_monitoring/issues)

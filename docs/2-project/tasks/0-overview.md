@@ -19,10 +19,6 @@ For detailed details about taskfile use:
 * [Main Taskfile](./1-main-taskfile.md)
 * [GitFlow Taskfile](./2-gitflow-taskfile.md)
 
----
-
 ## Contact
 
-Questions or issues with GitFlow setup? Reach out via [GitHub Issues](https://github.com/your-username/your-repo/issues) or email at [your.email@example.com](mailto:your.email@example.com).
-
----
+Questions or issues with GitFlow setup? Reach out via [GitHub Issues](https://github.com/sean-njela/k8s_monitoring/issues) or email at [seannjela@outlook.com](mailto:seannjela@outlook.com).

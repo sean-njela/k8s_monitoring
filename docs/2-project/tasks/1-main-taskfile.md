@@ -1,6 +1,6 @@
 # Taskfile Documentation
 
-This document explains the structure, conventions, and usage of the main [`Taskfile.yml`](../../../Taskfile.yaml). It serves as the primary automation entrypoint for development, deployment, monitoring, and utility workflows in this project.
+This document explains the structure, conventions, and usage of the main `Taskfile.yaml`. It serves as the primary automation entrypoint for development, deployment, monitoring, and utility workflows in this project.
 
 ## Purpose
 
@@ -37,23 +37,23 @@ Several key variables are declared for reuse across tasks:
 
 * **Cluster and namespace:**
 
-  * `KIND_CLUSTER_NAME`: Kind cluster name
-  * `DEV_CLUSTER`: Development cluster logical name
-  * `DEV_NS`: Kubernetes namespace for monitoring
+    * `KIND_CLUSTER_NAME`: Kind cluster name
+    * `DEV_CLUSTER`: Development cluster logical name
+    * `DEV_NS`: Kubernetes namespace for monitoring
 
 * **Services & ports:**
 
-  * `PROM_SVC`, `GRAF_SVC`, `APP_SVC`, `ALERTM_SVC`
-  * `PROM_PORT`, `APP_PORT`, `ALERTM_PORT`, `GRAF_PORT`
+    * `PROM_SVC`, `GRAF_SVC`, `APP_SVC`, `ALERTM_SVC`
+    * `PROM_PORT`, `APP_PORT`, `ALERTM_PORT`, `GRAF_PORT`
 
 * **Helm:**
 
-  * `HELM_REPO_URL`, `HELM_CHART_NAME`, `CUSTOM_HELM_REPO_NAME`, `CUSTOM_HELM_CHART_NAME`
-  * Values files for Helm (`FINAL_HELM_VALUES_FILE`, `READ_HELM_VALUES_FILE`)
+    * `HELM_REPO_URL`, `HELM_CHART_NAME`, `CUSTOM_HELM_REPO_NAME`, `CUSTOM_HELM_CHART_NAME`
+    * Values files for Helm (`FINAL_HELM_VALUES_FILE`, `READ_HELM_VALUES_FILE`)
 
 * **Metadata:**
 
-  * `PROJECT_NAME`, `TIMESTAMP` (dynamic), and app Docker image name.
+    * `PROJECT_NAME`, `TIMESTAMP` (dynamic), and app Docker image name.
 
 This ensures **one change in variables propagates everywhere** (DRY principle).
 
@@ -95,7 +95,7 @@ task
 
 * **Port forward tasks:**
 
-  * `port-fwd-prom`, `port-fwd-app`, `port-fwd-alertm`, `port-fwd-graf`
+    * `port-fwd-prom`, `port-fwd-app`, `port-fwd-alertm`, `port-fwd-graf`
 
 * **`get-graf-passwd`**: Fetches Grafana admin password from Kubernetes secret.
 
@@ -175,6 +175,8 @@ task
   ```bash
   task --list-all
   ```
-* Always verify Helm values files (`k8s/values` vs `k8s/read_values`) before upgrades.
-* Use port-forward tasks only for local debugging. For real environments, prefer ingress or LoadBalancer services.
-* `prod`, `cleanup-prod`, and other stubs are intentionally left for extension in real deployments.
+
+!!! warning
+    * Always verify Helm values files (`k8s/values` vs `k8s/read_values`) before upgrades.
+    * Use port-forward tasks only for local debugging. For real environments, prefer ingress or LoadBalancer services.
+    * `prod`, `cleanup-prod`, and other stubs are intentionally left for extension in real deployments.
