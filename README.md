@@ -132,15 +132,28 @@ Everything ran well if you see the following output:
 ```bash
 > task status
 task: [status] kubectl get all -n k8s-monitoring-ns
-[status] NAME                                                         READY   STATUS    RESTARTS      AGE
-[status] pod/alertmanager-prometheus-kube-prometheus-alertmanager-0   2/2     Running   2 (58m ago)   116m
-[status] pod/prometheus-demo-app-794dc7c997-bz9fp                     1/1     Running   1 (58m ago)   107m
-[status] pod/prometheus-demo-app-794dc7c997-g4275                     1/1     Running   1 (58m ago)   107m
-[status] pod/prometheus-grafana-674cf8cb44-v8vlb                      3/3     Running   3 (58m ago)   117m
-[status] pod/prometheus-kube-prometheus-operator-7984bfd549-g9gnx     1/1     Running   2 (57m ago)   117m
-[status] pod/prometheus-kube-state-metrics-7c5fb9d798-xwdpq           1/1     Running   2 (57m ago)   117m
-[status] pod/prometheus-prometheus-kube-prometheus-prometheus-0       2/2     Running   2 (58m ago)   116m
-[status] pod/prometheus-prometheus-node-exporter-scsd8                1/1     Running   1 (58m ago)   117m
+[status] NAME                                                         READY   STATUS    RESTARTS       AGE
+[status] pod/alertmanager-prometheus-kube-prometheus-alertmanager-0   2/2     Running   0          
+    6h26m
+[status] pod/log-generator-7d6d496f9-8jkkg                            1/1     Running   0          
+    107m
+[status] pod/loki-0                                                   2/2     Running   0          
+    4h30m
+[status] pod/loki-canary-bcplv                                        1/1     Running   0          
+    4h53m
+[status] pod/loki-gateway-59548bddcd-w24bt                            1/1     Running   0          
+    4h53m
+[status] pod/prometheus-demo-app-f5d79d7f5-2v4rk                      1/1     Running   0          
+    6h27m
+[status] pod/prometheus-grafana-674cf8cb44-48pnf                      3/3     Running   0          
+    6h27m
+[status] pod/prometheus-kube-prometheus-operator-5cdddd9b5-xqnmg      1/1     Running   1 (150m ago)   6h27m
+[status] pod/prometheus-kube-state-metrics-7c5fb9d798-xnhhg           1/1     Running   1 (150m ago)   6h27m
+[status] pod/prometheus-prometheus-kube-prometheus-prometheus-0       2/2     Running   1 (149m ago)   6h26m
+[status] pod/prometheus-prometheus-node-exporter-d5hz6                1/1     Running   0          
+    6h27m
+[status] pod/promtail-75845fb6f9-bhwdk                                1/1     Running   0          
+    107m
 ```
 
 Then visit [localhost:3002]() to access the Grafana UI.
@@ -193,6 +206,14 @@ If you do not want the gitflow tasks, you can remove the `Taskfile.gitflow.yaml`
 
 > Important notes to remember whilst using the project
 
+These are the current versions of the charts we used in this tutorial:
+
+```bash
+NAME           CHART                            APP VERSION
+loki           loki-6.41.1                      3.5.5
+prometheus     kube-prometheus-stack-77.11.1    v0.85.0
+```
+
 ## Troubleshooting
 
 For comprehensive troubleshooting, refer to the [Troubleshooting](docs/3-troubleshooting/overview.md) section. Or open the github pages [here](https://sean-njela.github.io/docs/3-troubleshooting/overview.md) and use the search bar to search your issue (USE INDIVIDUAL KEYWORDS NOT THE ISSUE NAME).
@@ -202,6 +223,7 @@ For comprehensive troubleshooting, refer to the [Troubleshooting](docs/3-trouble
 * [x] Metrics Collection & Visualization – real-time system, application, and container insights
 * [x] Alerting & Incident Response – proactive notifications via Slack/Email/PagerDuty
 * [ ] App instrumentation
+* [ ] Add Terraform
 
 ## Contributing
 

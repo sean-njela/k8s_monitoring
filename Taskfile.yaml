@@ -56,38 +56,50 @@ env:
 
 # Global variables (static or dynamic via shell)
 vars:
-  PROJECT_NAME: '{{.PROJECT_NAME | default "my-project"}}'
-  TIMESTAMP:
-    sh: date '+%Y%m%d%H%M%S'
-  GRAF_URL: "Grafana → http://localhost:3002"
-  PROM_URL: "Prometheus → http://localhost:9090"
-  APP_URL: "Prometheus → http://localhost:3000"
-  ALERTM_URL: "Alert Manager → http://localhost:9093"
+  # docker
   APP_DOCKER_IMAGE: sanjeevkt720/prometheus-demo:latest
+  # kind
   KIND_CLUSTER_NAME: k8s-monitoring-control-plane
   DEV_CLUSTER: k8s-monitoring
   DEV_NS: k8s-monitoring-ns
-  HELM_REPO_URL: https://prometheus-community.github.io/helm-charts
-  HELM_CHART_NAME: kube-prometheus-stack
-  CUSTOM_HELM_REPO_NAME: prometheus-community
-  CUSTOM_HELM_CHART_NAME: prometheus
-  FINAL_HELM_VALUES_FILE: k8s/values/prometheus-helm-values.yaml
-  READ_HELM_VALUES_FILE: k8s/read_values/prometheus-helm-values.yaml
+  # grafana/loki
+  GRAF_HELM_REPO_URL: https://grafana.github.io/helm-charts
+  GRAF_CUSTOM_HELM_REPO_NAME: grafana
+  LOKI_HELM_CHART_NAME: loki
+  LOKI_CUSTOM_HELM_CHART_NAME: loki
+  LOKI_FINAL_HELM_VALUES_FILE: k8s/values/loki-helm-values.yaml
+  READ_LOKI_HELM_VALUES_FILE: k8s/read_values/loki-helm-values.yaml
+  LOKI_HELM_CHART_VERSION: 6.41.1
+  # prometheus
+  PROM_HELM_REPO_URL: https://prometheus-community.github.io/helm-charts
+  PROM_HELM_CHART_NAME: kube-prometheus-stack
+  PROM_CUSTOM_HELM_REPO_NAME: prometheus-community
+  PROM_CUSTOM_HELM_CHART_NAME: prometheus
+  PROM_FINAL_HELM_VALUES_FILE: k8s/values/kube-prometheus-helm-values.yaml
+  READ_PROM_HELM_VALUES_FILE: k8s/read_values/kube-prometheus-helm-values.yaml
+  PROM_HELM_CHART_VERSION: 77.11.1
+  # services
   PROM_SVC: svc/prometheus-kube-prometheus-prometheus
   GRAF_SVC: svc/prometheus-grafana
   APP_SVC: svc/prometheus-demo-app-svc
   ALERTM_SVC: svc/alertmanager-operated
+  # ports
   PROM_PORT: 9090
   APP_PORT: 3000
   ALERTM_PORT: 9093
   GRAF_PORT: "3002:80"
+  # info
+  GRAF_URL: "Grafana → http://localhost:3002"
+  PROM_URL: "Prometheus → http://localhost:9090"
+  APP_URL: "Prometheus → http://localhost:3000"
+  ALERTM_URL: "Alert Manager → http://localhost:9093"
+
 
 includes:
   # Example include of shared tasks
   common:
     taskfile: ./Taskfile.gitflow.yaml
     flatten: true
-
 
 
 # # # # # # # --------- # # # # # # # --------- # # # # # #
@@ -100,14 +112,14 @@ tasks:
       - task --list-all
 
 
-
   # ─── Setup Task ──────────────────────────────────────────────────────────────
   setup:
     desc: "⚙️ Setup environment: install dependencies, generate config etc."
     cmds:
       - task: create-cluster-dev
-      - task: kind-load-images
+      # - task: kind-load-images TODO: fix (wrong cluster name i think)
       - task: helm-install-prom
+      - task: helm-install-loki
       - task: deploy-app
 
 
@@ -127,11 +139,9 @@ tasks:
       - kubens {{.DEV_NS}}
 
 
-
   # ─── Production Task ─────────────────────────────────────────────────────────
   prod:
     desc: "🚀 Provision and deploy to production"
-
 
 
   # # # # # # # ---------- # # # # # # # ---------- # # # # # # #
@@ -143,7 +153,6 @@ tasks:
       - ss -tunl
 
 
-
   # # # # # # # ---------- # # # # # # # ---------- # # # # # # #
   # Docs
   # # # # # # # ---------- # # # # # # # ---------- # # # # # # #
@@ -151,7 +160,6 @@ tasks:
     desc: "🌐 Serve docs locally -> http://127.0.0.1:8000/docs/"
     cmds:
       - poetry run mkdocs serve --clean
-
 
 
   # # # # # # # ---------- # # # # # # # ---------- # # # # # # #
@@ -176,29 +184,43 @@ tasks:
       - mike list
 
 
-
 # ─── Helm ───────────────────────────────────────────────────────────
-
   helm-install-prom:
     desc: "⚙️ Install Prometheus Helm Chart"
     cmds:
-      - helm repo add {{.CUSTOM_HELM_REPO_NAME}} {{.HELM_REPO_URL}}
+      - helm repo add {{.PROM_CUSTOM_HELM_REPO_NAME}} {{.PROM_HELM_REPO_URL}}
       - helm repo update
-      - helm install {{.CUSTOM_HELM_CHART_NAME}} {{.CUSTOM_HELM_REPO_NAME}}/{{.HELM_CHART_NAME}} -f {{.FINAL_HELM_VALUES_FILE}}
+      - kubens {{.DEV_NS}}
+      - helm install {{.PROM_CUSTOM_HELM_CHART_NAME}} {{.PROM_CUSTOM_HELM_REPO_NAME}}/{{.PROM_HELM_CHART_NAME}} --version {{.PROM_HELM_CHART_VERSION}} -f {{.PROM_FINAL_HELM_VALUES_FILE}}
       - task: prom-helm-values
 
-  helm-upgrade-prom:
+  helm-install-loki:
+    desc: "⚙️ Install Grafana Helm Chart"
+    cmds:
+      - helm repo add {{.GRAF_CUSTOM_HELM_REPO_NAME}} {{.GRAF_HELM_REPO_URL}}
+      - helm repo update
+      - kubens {{.DEV_NS}}
+      - helm install {{.LOKI_CUSTOM_HELM_CHART_NAME}} {{.GRAF_CUSTOM_HELM_REPO_NAME}}/{{.LOKI_HELM_CHART_NAME}} --version {{.LOKI_HELM_CHART_VERSION}} -f {{.LOKI_FINAL_HELM_VALUES_FILE}}
+      - task: loki-helm-values
+
+  helm-upgrade-all:
     desc: "⚙️ Upgrade Prometheus Helm Chart"
     cmds:
       - kubens {{.DEV_NS}}
-      - helm upgrade {{.CUSTOM_HELM_CHART_NAME}} {{.CUSTOM_HELM_REPO_NAME}}/{{.HELM_CHART_NAME}} -f {{.FINAL_HELM_VALUES_FILE}}
+      - helm upgrade {{.PROM_CUSTOM_HELM_CHART_NAME}} {{.PROM_CUSTOM_HELM_REPO_NAME}}/{{.PROM_HELM_CHART_NAME}} -f {{.PROM_FINAL_HELM_VALUES_FILE}}
+      - helm upgrade {{.LOKI_CUSTOM_HELM_CHART_NAME}} {{.GRAF_CUSTOM_HELM_REPO_NAME}}/{{.LOKI_HELM_CHART_NAME}} -f {{.LOKI_FINAL_HELM_VALUES_FILE}}
 
   prom-helm-values:
-    desc: "Save Helm chart values"
+    desc: "Save Prometheus Helm chart values"
     cmds:
-      - helm show values {{.CUSTOM_HELM_REPO_NAME}}/{{.HELM_CHART_NAME}} > {{.READ_HELM_VALUES_FILE}}
-      - echo "Open {{.READ_HELM_VALUES_FILE}}"
+      - helm show values {{.PROM_CUSTOM_HELM_REPO_NAME}}/{{.PROM_HELM_CHART_NAME}} --version {{.PROM_HELM_CHART_VERSION}} > {{.READ_PROM_HELM_VALUES_FILE}}
+      - echo "Open {{.READ_PROM_HELM_VALUES_FILE}}"
 
+  loki-helm-values:
+    desc: "Save Grafana Helm chart values"
+    cmds:
+      - helm show values {{.GRAF_CUSTOM_HELM_REPO_NAME}}/{{.LOKI_HELM_CHART_NAME}} --version {{.LOKI_HELM_CHART_VERSION}} > {{.READ_LOKI_HELM_VALUES_FILE}}
+      - echo "Open {{.READ_LOKI_HELM_VALUES_FILE}}"
 
 
 # ─── kubectl ───────────────────────────────────────────────────────────
@@ -209,12 +231,12 @@ tasks:
 
 
 # ─── App ───────────────────────────────────────────────────────────
-
   deploy-app:
     desc: "Deploy our application into the cluster"
     cmds:
       - kubens {{.DEV_NS}}
       - kubectl create -f k8s/
+      - task: apply-app
 
   apply-app:
     desc: "Deploy our application into the cluster"
@@ -223,9 +245,7 @@ tasks:
       - kubectl apply -f k8s/
 
 
-
 # ─── Port Forward ───────────────────────────────────────────────────────────
-
   port-fwd-prom:
     desc: "Port forward Prometheus"
     cmds:
@@ -270,11 +290,11 @@ tasks:
   cleanup-dev:
     desc: "🔁 Cleanup development resources only"
     cmds:
-      - kubens {{.DEV_NS}} || echo "NS switch failed - Error not found"
-      - helm uninstall {{.CUSTOM_HELM_CHART_NAME}} || echo "Helm uninstall failed - Error not found"
-      - kubectl delete -f k8s/ || echo "k8s/ deployment doesnt exist"
-      - docker stop {{.KIND_CLUSTER_NAME}} || echo "Container not running"
-      - helm repo remove {{.CUSTOM_HELM_REPO_NAME}} || echo "Remove Repo failed - Error not found"
+      # - kubens {{.DEV_NS}} || echo "NS switch failed - Error not found"
+      # - helm uninstall {{.PROM_CUSTOM_HELM_CHART_NAME}} || echo "Helm uninstall failed - Error not found"
+      # - kubectl delete -f k8s/ || echo "k8s/ deployment doesnt exist"
+      # - docker stop {{.KIND_CLUSTER_NAME}} || echo "Container not running"
+      # - helm repo remove {{.PROM_CUSTOM_HELM_REPO_NAME}} || echo "Remove Repo failed - Error not found"
       - kind delete cluster -n {{.DEV_CLUSTER}} || echo "Delete Cluster failed - Error not found"
 
   cleanup-prod:
