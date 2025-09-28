@@ -266,8 +266,10 @@ The `alertmanager-config.yaml` file is added alongside the app deployment files 
 
 ```bash
 task apply-app
+
 # then
 kubectl get alertmanagers.monitoring.coreos.com -o yaml # to confirm if our service monitor is deployed
+
 # output:
 # serach for:
 ...
@@ -275,11 +277,14 @@ kubectl get alertmanagers.monitoring.coreos.com -o yaml # to confirm if our serv
       matchLabels:
         resource: prometheus
 ...
+
 # and
 kubectl get alertmanagerconfig
+
 # output:
 NAME                               AGE
 prometheus-demo-app-alert-config   7m59s
+
 # then:
 task port-fwd-alertm
 # and visit /localhost:9093
@@ -357,8 +362,6 @@ task: [status] kubectl get all -n k8s-monitoring-ns
 [status] statefulset.apps/alertmanager-prometheus-kube-prometheus-alertmanager   1/1     116m
 [status] statefulset.apps/prometheus-prometheus-kube-prometheus-prometheus       1/1     116m
 ```
-
-
 
 ### Setting up AlertManager with Slack
 
@@ -481,52 +484,52 @@ It is not production-ready by default. The stack (kube-prometheus-stack, Loki, G
 
 1. **Persistence**
 
-   * Default Helm charts often use emptyDir volumes. Data loss occurs on pod rescheduling.
-   * Loki, Prometheus, and Alertmanager require durable storage (PVCs on reliable storage classes).
+      * Default Helm charts often use emptyDir volumes. Data loss occurs on pod rescheduling.
+      * Loki, Prometheus, and Alertmanager require durable storage (PVCs on reliable storage classes).
 
 2. **High availability (HA)**
 
-   * kube-prometheus-stack deploys single replicas by default. Prometheus, Alertmanager, and Loki should run in HA mode with replication and sharding.
+      * kube-prometheus-stack deploys single replicas by default. Prometheus, Alertmanager, and Loki should run in HA mode with replication and sharding.
 
 3. **Scaling**
 
-   * Loki requires proper deployment mode (distributor, ingester, querier, etc.) for large clusters. Monolithic mode will not handle production workloads.
-   * Prometheus requires federation or Cortex/Thanos for horizontal scalability.
+      * Loki requires proper deployment mode (distributor, ingester, querier, etc.) for large clusters. Monolithic mode will not handle production workloads.
+      * Prometheus requires federation or Cortex/Thanos for horizontal scalability.
 
 4. **Security**
 
-   * RBAC must be minimal and auditable.
-   * Grafana and Alertmanager must not expose admin endpoints publicly without authentication and TLS.
-   * Secrets in Helm values should not be stored in plaintext.
+      * RBAC must be minimal and auditable.
+      * Grafana and Alertmanager must not expose admin endpoints publicly without authentication and TLS.
+      * Secrets in Helm values should not be stored in plaintext.
 
 5. **Resource limits**
 
-   * Default charts lack tuned CPU/memory requests and limits. These must be set based on workload.
+      * Default charts lack tuned CPU/memory requests and limits. These must be set based on workload.
 
 6. **Backup and retention**
 
-   * No backup strategy for Prometheus TSDB, Loki indexes, or Alertmanager silences.
-   * Retention periods must be tuned for cost and compliance.
+      * No backup strategy for Prometheus TSDB, Loki indexes, or Alertmanager silences.
+      * Retention periods must be tuned for cost and compliance.
 
 7. **Networking**
 
-   * Ingress configuration requires TLS termination and WAF/firewall integration.
-   * Multi-tenant isolation may be required if different teams access Grafana or Loki.
+      * Ingress configuration requires TLS termination and WAF/firewall integration.
+      * Multi-tenant isolation may be required if different teams access Grafana or Loki.
 
 8. **Alerting pipeline**
 
-   * Alertmanager configuration must be HA and integrated with real notification systems (PagerDuty, OpsGenie, email, Slack).
-   * Silencing, inhibition, and deduplication must be tuned.
+      * Alertmanager configuration must be HA and integrated with real notification systems (PagerDuty, OpsGenie, email, Slack).
+      * Silencing, inhibition, and deduplication must be tuned.
 
 9. **OpenTelemetry integration**
 
-   * Only provides traces/metrics/logs pipelines. Backend storage (Tempo, Jaeger, or vendor) is required.
-   * Exporters must be configured per language/runtime.
+      * Only provides traces/metrics/logs pipelines. Backend storage (Tempo, Jaeger, or vendor) is required.
+      * Exporters must be configured per language/runtime.
 
 10. **Operations**
 
-    * Helm upgrades can break CRDs. Proper GitOps or CI/CD integration is required.
-    * Dashboards and alerts must be version-controlled, not edited manually in Grafana.
+      * Helm upgrades can break CRDs. Proper GitOps or CI/CD integration is required.
+      * Dashboards and alerts must be version-controlled, not edited manually in Grafana.
 
 ### Minimal production-ready setup requires:
 
@@ -545,71 +548,63 @@ It is not production-ready by default. The stack (kube-prometheus-stack, Loki, G
 
 1. **Prometheus / kube-prometheus-stack**
 
-   * You no longer run Prometheus in-cluster for long-term storage.
-   * Instead, you deploy the **Grafana Agent** (or Prometheus remote-write) in your cluster. It scrapes Kubernetes metrics and forwards them to Grafana Cloud’s Mimir backend.
-   * kube-prometheus-stack is unnecessary except if you still want local alerting or dashboards inside the cluster.
+      * You no longer run Prometheus in-cluster for long-term storage.
+      * Instead, you deploy the **Grafana Agent** (or Prometheus remote-write) in your cluster. It scrapes Kubernetes metrics and forwards them to Grafana Cloud’s Mimir backend.
+      * kube-prometheus-stack is unnecessary except if you still want local alerting or dashboards inside the cluster.
 
 2. **Loki**
 
-   * You do not run Loki in-cluster unless you want a local buffer.
-   * Logs are shipped with Grafana Agent, Fluent Bit, or Promtail to Grafana Cloud Loki.
+      * You do not run Loki in-cluster unless you want a local buffer.
+      * Logs are shipped with Grafana Agent, Fluent Bit, or Promtail to Grafana Cloud Loki.
 
 3. **Grafana**
 
-   * You do not deploy Grafana in-cluster. Dashboards are hosted in Grafana Cloud.
-   * You can still federate multiple data sources (cloud Loki, cloud Prometheus, external APIs).
+      * You do not deploy Grafana in-cluster. Dashboards are hosted in Grafana Cloud.
+      * You can still federate multiple data sources (cloud Loki, cloud Prometheus, external APIs).
 
 4. **Alertmanager**
 
-   * You do not run Alertmanager. Alert routing is handled in Grafana Cloud’s alerting service.
-   * You must re-implement silences, inhibition, and notification channels in Grafana Cloud.
+      * You do not run Alertmanager. Alert routing is handled in Grafana Cloud’s alerting service.
+      * You must re-implement silences, inhibition, and notification channels in Grafana Cloud.
 
 5. **OpenTelemetry**
 
-   * You deploy the OpenTelemetry Collector in your cluster.
-   * The collector exports traces and metrics directly to Grafana Cloud Tempo (for traces) and Mimir (for metrics).
-   * No need to deploy Tempo or Jaeger locally.
+      * You deploy the OpenTelemetry Collector in your cluster.
+      * The collector exports traces and metrics directly to Grafana Cloud Tempo (for traces) and Mimir (for metrics).
+      * No need to deploy Tempo or Jaeger locally.
 
 
 
 ### Setup steps
+1. **Sign up and create a Grafana Cloud stack**  
+      - Provision an account with metrics, logs, and traces enabled.  
+      - Obtain API keys (for metrics, logs, traces).  
 
-1. **Sign up and create a Grafana Cloud stack**
+2. **Deploy Grafana Agent in Kubernetes**  
+      - Install via Helm or YAML manifests.  
+      - Configure it to:  
+         - Scrape kubelet, kube-state-metrics, node exporter.  
+         - Remote-write to Grafana Cloud Prometheus endpoint.  
+         - Forward logs via Loki endpoint.  
+         - Ship traces via Tempo endpoint (optionally through OTLP).  
 
-   * Provision an account with metrics, logs, and traces enabled.
-   * Obtain API keys (for metrics, logs, traces).
+3. **Deploy OpenTelemetry Collector**  
+      - Configure it to receive OTLP (from application SDKs).  
+      - Export traces and metrics to Grafana Cloud endpoints.  
 
-2. **Deploy Grafana Agent in Kubernetes**
+4. **Remove redundant in-cluster components**  
+      - No need for Prometheus statefulset, Loki statefulset, Grafana deployment, or Alertmanager.  
+      - Keep kube-state-metrics and node exporter, since they are needed for scraping.  
 
-   * Install via Helm or YAML manifests.
-   * Configure it to:
+5. **Configure dashboards and alerting in Grafana Cloud**  
+      - Import Kubernetes dashboards (pre-built).  
+      - Define alert rules centrally in Grafana Cloud.  
+      - Integrate notification channels (PagerDuty, Slack, Teams, email).  
 
-     * Scrape kubelet, kube-state-metrics, node exporter.
-     * Remote-write to Grafana Cloud Prometheus endpoint.
-     * Forward logs via Loki endpoint.
-     * Ship traces via Tempo endpoint (optionally through OTLP).
-
-3. **Deploy OpenTelemetry Collector**
-
-   * Configure it to receive OTLP (from application SDKs).
-   * Export traces and metrics to Grafana Cloud endpoints.
-
-4. **Remove redundant in-cluster components**
-
-   * No need for Prometheus statefulset, Loki statefulset, Grafana deployment, or Alertmanager.
-   * Keep kube-state-metrics and node exporter, since they are needed for scraping.
-
-5. **Configure dashboards and alerting in Grafana Cloud**
-
-   * Import Kubernetes dashboards (pre-built).
-   * Define alert rules centrally in Grafana Cloud.
-   * Integrate notification channels (PagerDuty, Slack, Teams, email).
-
-6. **Secure connections**
-
-   * Use Grafana Cloud TLS endpoints.
-   * Store API keys as Kubernetes secrets.
-   * Apply RBAC to agents and collectors.
+6. **Secure connections**  
+      - Use Grafana Cloud TLS endpoints.  
+      - Store API keys as Kubernetes secrets.  
+      - Apply RBAC to agents and collectors.  
 
 ### Trade-offs
 
@@ -628,3 +623,176 @@ It is not production-ready by default. The stack (kube-prometheus-stack, Loki, G
 * Alerts require re-implementation in Grafana Cloud (cannot reuse Alertmanager config directly).
 * If compliance requires on-prem retention, this may fail audits.
 
+## Adding Sentry
+
+### What Grafana Cloud covers
+
+* **Infrastructure metrics** (CPU, memory, node, pod health).
+* **Application metrics** (via Prometheus exporters or OpenTelemetry).
+* **Logs** (via Loki).
+* **Traces** (via Tempo).
+* **Alerting and dashboards** across metrics, logs, traces.
+
+This gives a wide view of system health and performance.
+
+
+
+### What Sentry covers
+
+* **Error monitoring and crash reporting** at application level.
+* **Contextual stack traces**: full code paths, local variables, user sessions.
+* **Release tracking**: errors linked to git commits and releases.
+* **User impact analysis**: how many users are affected by an error.
+* **Frontend and mobile coverage**: JavaScript, iOS, Android SDKs that Grafana does not provide out of the box.
+
+
+
+### Trade-offs
+
+* You can approximate some of Sentry’s functions with OpenTelemetry tracing + Grafana Tempo, but:
+
+  * You will not get the same developer-friendly stack traces.
+  * You will not get release/version tracking without extra work.
+  * You will not get automatic issue grouping and user impact analysis.
+* If you only care about infra + service health, Sentry is redundant.
+* If you need application-level error insight (especially for frontend and user-facing code), Sentry remains valuable.
+
+
+
+### Practical setup
+
+* Keep **Grafana Cloud** (metrics/logs/traces/infra alerting).
+* Use **Sentry** specifically for application exceptions and end-user error reporting.
+* Link them:
+
+  * Send Sentry issues into Grafana alerting or PagerDuty.
+  * Add trace IDs in both Sentry and OpenTelemetry spans so developers can pivot between them.
+
+Integration is done at two layers:
+
+1. **Application layer (code instrumentation)** — Sentry SDK inside Django.
+2. **Observability layer (linking Sentry to Grafana Cloud)** — connect Sentry issues with Grafana Cloud traces/logs via trace IDs.
+
+
+
+## 1. Application layer: Django + Sentry
+
+Install the SDK:
+
+```bash
+pip install --upgrade sentry-sdk
+```
+
+Minimal safe configuration in `settings.py`:
+
+```python
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+import os
+
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_DSN"),  # DSN from Sentry project settings
+    integrations=[
+        DjangoIntegration(),
+        CeleryIntegration(),  # include if Celery is used
+        LoggingIntegration(  # capture logs as breadcrumbs
+            level=None,       # disable default logging capture
+            event_level="ERROR",  # send only errors as events
+        ),
+    ],
+    environment=os.environ.get("APP_ENV", "production"),
+    release=os.environ.get("GIT_COMMIT_SHA", "unknown"),  # track release
+    traces_sample_rate=0.1,  # adjust rate for performance monitoring
+    send_default_pii=False,  # protect user data unless explicitly needed
+)
+```
+
+### Security and performance considerations
+
+* `send_default_pii=False` ensures no sensitive PII is leaked.
+* Control sampling via `traces_sample_rate` to manage ingestion costs.
+* Always inject `release` and `environment` for issue grouping.
+* Store DSN in Kubernetes Secrets, not in code.
+
+
+
+## 2. Observability layer: Linking Sentry and Grafana Cloud
+
+The goal is correlation. Grafana Cloud handles metrics/logs/traces; Sentry handles exceptions. To connect them:
+
+### a. Enable distributed tracing
+
+* Use **Sentry performance monitoring** with Django.
+* If you also instrument your Django API with **OpenTelemetry**, you can **propagate trace IDs** so that a request has both:
+
+  * A trace in Grafana Cloud Tempo.
+  * An error in Sentry referencing the same trace ID.
+
+Example middleware to inject the OTel trace ID into Sentry context:
+
+```python
+from sentry_sdk import configure_scope
+from opentelemetry import trace
+
+class TraceIdMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        tracer = trace.get_tracer(__name__)
+        span = trace.get_current_span()
+        trace_id = span.get_span_context().trace_id
+        if trace_id:
+            with configure_scope() as scope:
+                scope.set_tag("otel_trace_id", format(trace_id, "032x"))
+        return self.get_response(request)
+```
+
+Now an exception in Sentry will include the OTel trace ID. In Grafana Cloud you can query traces by ID and cross-link.
+
+### b. Alerts integration
+
+* Configure **Sentry alert rules** (e.g. “More than 50 errors in 5 minutes”).
+* Forward them to the same incident pipeline as Grafana Cloud (Slack, PagerDuty, OpsGenie).
+* Result: both infra and application issues flow to the same channel.
+
+### c. Dashboards
+
+* Sentry has its own UI.
+* For unified view: add **Sentry plugin datasource** to Grafana, or embed Sentry issue widgets in Grafana dashboards.
+
+
+
+## 3. Kubernetes deployment steps
+
+1. **Provision Sentry project** → get DSN.
+
+2. **Create Kubernetes Secret** with DSN, e.g.:
+
+   ```yaml
+   apiVersion: v1
+   kind: Secret
+   metadata:
+     name: sentry-dsn
+   type: Opaque
+   stringData:
+     SENTRY_DSN: "https://public_key@o0.ingest.sentry.io/0"
+   ```
+
+3. **Inject into Django Deployment** via environment variable.
+
+4. **Redeploy Django pods**.
+
+5. **Confirm events** appear in Sentry dashboard.
+
+6. **Validate cross-linking** by checking that `otel_trace_id` tags appear in Sentry issues and can be matched with Grafana Cloud Tempo traces.
+
+
+
+### Outcome
+
+* Grafana Cloud handles **metrics, logs, distributed traces, and alerting**.
+* Sentry handles **rich error context, stack traces, and release tracking**.
+* Trace IDs bridge them, so developers can pivot from an API error in Sentry to the full request trace in Grafana Cloud.

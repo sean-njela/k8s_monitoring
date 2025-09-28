@@ -1,6 +1,6 @@
 # Taskfile Documentation
 
-This document explains the structure, conventions, and usage of the main [`Taskfile.yml`](../../Taskfile.yml). It serves as the primary automation entrypoint for development, deployment, monitoring, and utility workflows in this project.
+This document explains the structure, conventions, and usage of the main [`Taskfile.yml`](../../../Taskfile.yaml). It serves as the primary automation entrypoint for development, deployment, monitoring, and utility workflows in this project.
 
 ## Purpose
 
