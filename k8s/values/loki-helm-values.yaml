@@ -1,0 +1,68 @@
+# Deployment mode determines how Loki is deployed:
+# - SingleBinary: All components (write, read, backend) run inside a single process.
+#   Best for small or test setups.
+# - SimpleScalable: Components can be scaled independently. Suitable for medium workloads.
+# - Distributed: Each component is fully separated for large, production-scale deployments.
+deploymentMode: SingleBinary
+
+# SingleBinary mode replica count:
+# Controls how many copies of the single Loki binary are deployed.
+# For dev or test environments, 1 is enough. Multiple replicas require external storage and coordination.
+singleBinary:
+  replicas: 1
+
+# Independent component replicas for non-SingleBinary modes:
+# - write: Ingests log data and writes to storage.
+# - read: Handles queries by retrieving and processing data.
+# - backend: Provides indexing, query scheduling, and other supporting services.
+# These are not used in SingleBinary mode, so left as 0 here.
+write:
+  replicas: 0
+read:
+  replicas: 0
+backend:
+  replicas: 0
+
+# Chunks cache configuration:
+# Stores compressed log chunks in memory or another caching backend to speed up queries.
+# Disabled here for simplicity and reduced resource use.
+chunksCache:
+  enabled: false
+
+# Results cache configuration:
+# Stores query results to reduce repeated work for frequent queries.
+# Disabled here, usually enabled in production to reduce query load.
+resultsCache:
+  enabled: false
+
+# Helm test configuration:
+# Enables test jobs that verify the deployment is working after installation.
+# Disabled here to skip running tests.
+test:
+  enabled: false
+
+# Loki main configuration object:
+loki:
+  # Authentication and authorisation for API and endpoints.
+  # Disabled here for simplicity. Should be enabled in production for security.
+  auth_enabled: false
+
+  # Common configuration shared by all Loki components.
+  commonConfig:
+    # Replication factor determines how many copies of each piece of log data are stored.
+    # Set to 1 here because only a single binary is used. Production setups usually use 3.
+    replication_factor: 1
+
+  # Storage backend configuration:
+  storage:
+    # Storage type defines where chunks are stored. Options: filesystem, s3, gcs, etc.
+    type: filesystem
+    filesystem:
+      # Directory for storing chunk files (compressed log blocks)
+      chunks_directory: /var/loki/chunks
+      # Directory for storing rule evaluation outputs (if ruler is used)
+      rules_directory: /var/loki/rules
+
+  # Use a pre-defined test schema for table definitions and indexes.
+  # Simplifies development and testing. Production deployments should define explicit schemas.
+  useTestSchema: true

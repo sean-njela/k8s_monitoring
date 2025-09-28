@@ -1,5 +1,16 @@
 # What is Helm?
 
+!!! info
+    During  `helm install`, it's important to always state the version of helm chart that you are using by making use of the `--version` flag. A repeatable way is to use a tool like `Terraform`
+
+These are the current versions of the charts we used in this tutorial:
+
+```bash
+NAME           CHART                            APP VERSION
+loki           loki-6.41.1                      3.5.5
+prometheus     kube-prometheus-stack-77.11.1    v0.85.0
+```
+
 Helm is the **package manager for Kubernetes**.
 It manages **charts**, which are preconfigured collections of Kubernetes manifests.
 

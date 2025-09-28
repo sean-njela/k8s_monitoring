@@ -193,6 +193,45 @@ Also confirm in the Prometheus web app at `/rules`:
 
 ### Adding Alert Manager Rules
 
+First we need to note an important point when it comes to specifying custom values.yaml
+
+Helm merges your custom `values.yaml` with the chart’s default values.  
+It uses a **deep merge**, so you must preserve the full key path when overriding values.  
+
+- If you only define part of the path, Helm will ignore it.  
+- You must follow the parent hierarchy exactly as defined in the chart’s `values.yaml`.  
+- Always check the chart’s defaults with:  
+
+```bash
+  helm show values <chart>
+```
+
+If you try to set this at the root:
+
+```yaml
+alertmanagerConfigSelector:
+  matchLabels:
+    resource: prometheus
+```
+
+…it will fail, because `alertmanagerConfigSelector` is **not** a root key.
+
+In the **kube-prometheus-stack** chart, the correct path is under `prometheus.prometheusSpec`:
+
+```yaml
+prometheus:
+  prometheusSpec:
+    alertmanagerConfigSelector:
+      matchLabels:
+        resource: prometheus
+```
+
+* Helm only overrides keys at the correct hierarchy.
+* Wrong placement = no effect.
+* Always trace the full path from the chart’s default `values.yaml`.
+
+### Continuing with our setup
+
 Prometheus also has a CRD for handling alert manager rules named `AlertmangerConfig`.
 
 ![Screenshot of AlertmanagerConfig Yaml file](../assets/alertmanagerconfig-1.png)
@@ -207,7 +246,7 @@ By default this selector is not in prometheus' `values.yaml` so we have to add i
 task prom-helm-values
 ```
 
-Then edit the following:
+Then search for `alertmanagerConfigSelector`, copy the snippet and save in a custom values file as `k8s/prometheus-helm-values.yaml`:
 
 ```yaml
 alertmanagerConfigSelector:
@@ -321,7 +360,7 @@ task: [status] kubectl get all -n k8s-monitoring-ns
 
 ---
 
-## Setting up AlertManager with Slack
+### Setting up AlertManager with Slack
 
 First head to [api.slack.com/apps](https://api.slack.com/apps)
 
@@ -353,6 +392,84 @@ In this demo we use a plain string secret.
 To test the alert, shutdown the app instance by either deleting the whole thing or scaling the app's deployment down to 0 pods and then check the slack channel.
 
 ![Screenshot of a Slack Alert](../assets/slack.png)
+
+### Set up Loki
+
+We wan't Logs for our application to also be shown in Grafana dashboards.
+
+It will make it easier to diagonise spikes and dips in resource usage metrics.
+
+Loki is part of the **Grafana Helm chart**. 
+
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+```
+
+We then save a custom values to the `k8s/values` directory.
+
+We only specify the sections we need to change.
+
+* We chose `deployment: SingleBinary` because it deploys every single component that loki needs as a single binary. This deploymentonly allows a loki to process a few gigabytes of logs a day whilst others result in Terrabytes albeit with a much more complex deployment. The deployyment mode should always match the environment that you the cluster operates.
+* Write, read and backend replicas are set to 0 as we only have a single deployment
+* Storage is set to filesystem instead of a cloud storage option.
+* Disabled caching and helm testing
+
+```bash
+kubens k8s-monitoring-ns
+helm install loki grafana/loki -f k8s/values/graf-helm-values.yaml
+```
+
+!!! info
+    During  `helm install`, it's important to always state the version of helm chart that you are using by making use of the `--version` flag. A repeatable way is to use a tool like `Terraform`
+
+These are the current versions of the charts we used in this tutorial:
+
+```bash
+NAME           CHART                            APP VERSION
+loki           loki-6.41.1                      3.5.5
+prometheus     kube-prometheus-stack-77.11.1    v0.85.0
+```
+
+We then include a grafana section in the prometheus values file in the `k8s/values` directory, to include an additional data source named loki.
+
+We apply the changes.
+
+```bash
+task helm-upgrade-all
+```
+
+Inside the grafana UI we head to the data sources section to confirm that loki is there.
+
+![Screenshot of Grafana Datasources](../assets/grafana-datasources.png)
+
+### Generating Logs
+
+We can make use of a fake log generator container `mingrammer/flog`.
+
+In the repository we also have a Application deployment in `k8s/fake-logs.yaml` coupled with the fake log generator outputting the logs to a **PVC**, a promtail log collector mounted to the same **PVC** and a configMap to then send those over to loki.
+
+For **testing on a single-node cluster**, this manifest is okay. It will:
+
+* Generate fake JSON logs into a shared PVC.
+* Have Promtail tail the log file, parse JSON, and push entries to Loki.
+* Attach `http_method` and `http_status` as labels.
+* Use an ephemeral `emptyDir` for positions, good enough for short tests.
+
+Caveats you accept when testing this way:
+
+* **Not production-ready**: multiple replicas or nodes will break because of the RWO PVC.
+* **Data replay**: if Promtail restarts, it replays logs since positions are not persisted to durable storage.
+* **Log source unrealistic**: real apps log to `stdout`, not a shared file.
+* **Performance**: flog will generate constant noise. That’s fine for load testing Loki, not for validating app-level observability.
+
+So: for verifying that your stack is wired correctly (Promtail → Loki → Grafana queries), this setup is good enough.
+
+### Visualising in Grafana
+
+We then import the `grafana/dashboards/fake-logs-dashboard.json` file to visualise in grafana.
+
+![Screenshot of Fake Logs Dashboard](../assets/fake-logs-dashboard.png)
 
 And with that done, so is our setup !
 

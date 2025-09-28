@@ -1,0 +1,37 @@
+alertmanager:
+  alertmanagerSpec:
+    # alertmanagerConfigSelector controls which AlertmanagerConfig
+    # custom resources (CRs) will be selected and merged into the
+    # running Alertmanager configuration.
+    #
+    # By default, the Prometheus Operator looks for AlertmanagerConfig
+    # CRs in the same namespace as the Alertmanager instance.
+    # You can extend discovery to other namespaces using
+    # alertmanagerConfigNamespaceSelector (another setting).
+    #
+    # This selector follows standard Kubernetes label selector rules.
+    # You can use matchLabels or matchExpressions.
+    #
+    # In this example, only AlertmanagerConfig objects with the label
+    # "resource=prometheus" will be included in Alertmanager’s config.
+    alertmanagerConfigSelector:
+      matchLabels:
+        resource: prometheus
+
+# Grafana configuration
+grafana:
+  # additionalDataSources allows you to configure extra data sources
+  # that Grafana should know about, in addition to Prometheus which
+  # is automatically provisioned by the kube-prometheus-stack chart.
+  additionalDataSources:
+    - name: Loki                # The name that will appear in Grafana’s UI
+      type: loki                # The Grafana data source plugin type ("loki" is built in)
+      url: http://loki-gateway.k8s-monitoring-ns.svc.cluster.local
+                                # The URL Grafana uses to reach Loki.
+                                # Here it points to the "loki-gateway" Service
+                                # in namespace "k8s-monitoring-ns".
+                                # Must be resolvable inside the cluster.
+      access: proxy             # Use Grafana’s backend proxy to query Loki.
+                                # This is recommended for in-cluster services.
+                                # Alternatives: "direct" (browser connects directly),
+                                # but that only works if Loki is publicly exposed.
