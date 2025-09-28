@@ -18,7 +18,7 @@ Charts bundle deployments, services, config maps, secrets, ingress rules, and mo
 
 Helm makes installing, upgrading, rolling back, and managing complex Kubernetes apps predictable and repeatable.
 
----
+
 
 ## Why Use Helm?
 
@@ -32,21 +32,21 @@ Kubernetes manifests are verbose and repetitive. Managing large apps by hand is 
 
 Helm = apt/yum/homebrew, but for Kubernetes.
 
----
+
 
 ## Helm Architecture
 
 ```text
-   +-------------+
+   +-+
    | Helm Client |
-   +------+------+         +-----------------+
+   +++         +--+
           |                |  Kubernetes API |
-          |                +--------+--------+
+          |                +--+--+
           |                         |
-   +------+-------------------------+------+
+   ++-++
    |    Kubernetes Cluster (CRDs, RBAC,    |
    |   Deployments, Services, Secrets, etc)|
-   +---------------------------------------+
+   ++
 ```
 
 * **Helm Client** → CLI tool (`helm`).
@@ -54,18 +54,18 @@ Helm = apt/yum/homebrew, but for Kubernetes.
 * **Chart** → A bundle of templates and default values.
 * **Values** → User configuration overrides.
 
----
+
 
 ## Core Concepts
 
 | Term           | Meaning                                                         |
-| -------------- | --------------------------------------------------------------- |
+| -- |  |
 | **Chart**      | Package of Kubernetes resources.                                |
 | **Release**    | A deployed instance of a chart, identified by name + namespace. |
 | **Values**     | User-supplied config to customise a chart.                      |
 | **Repository** | Place where charts are stored and fetched (`helm repo add`).    |
 
----
+
 
 ## Basic Commands
 
@@ -99,7 +99,7 @@ helm list -n <namespace>
 helm uninstall <release-name> -n <namespace>
 ```
 
----
+
 
 ## Managing Deployments After Install
 
@@ -126,7 +126,7 @@ replicaCount: 0
 helm upgrade <release-name> <chart> -f values.yaml -n <namespace>
 ```
 
----
+
 
 ## Helm Chart Structure
 
@@ -139,7 +139,7 @@ mychart/
   templates/_helpers.tpl  # Helper template functions
 ```
 
----
+
 
 ## Helm Values
 
@@ -163,7 +163,7 @@ Override values:
 helm install myapp ./mychart --set replicaCount=3 --set image.tag=1.26
 ```
 
----
+
 
 ## Template Language
 
@@ -185,14 +185,14 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
 ```
 
----
+
 
 ## Helm Cheat Sheet
 
 ### Core Operations
 
 | Task         | Command                                                 |
-| ------------ | ------------------------------------------------------- |
+|  | - |
 | Install      | `helm install <release> <chart> -n <ns>`                |
 | Upgrade      | `helm upgrade <release> <chart> -f values.yaml -n <ns>` |
 | Rollback     | `helm rollback <release> <rev> -n <ns>`                 |
@@ -200,19 +200,19 @@ spec:
 | Diff changes | `helm diff upgrade <release> <chart>`                   |
 | Dry run      | `helm install <release> <chart> --dry-run --debug`      |
 
----
+
 
 ### Chart Dev Commands
 
 | Task            | Command                            |
-| --------------- | ---------------------------------- |
+|  | - |
 | Create chart    | `helm create <name>`               |
 | Lint chart      | `helm lint ./mychart`              |
 | Package chart   | `helm package ./mychart`           |
 | Push chart      | `helm push ./mychart oci://<repo>` |
 | Template render | `helm template ./mychart`          |
 
----
+
 
 ### Security Notes
 
@@ -220,7 +220,7 @@ spec:
 * Restrict Tiller (Helm v2 only, obsolete). Helm v3 does not need server-side components.
 * Control RBAC for Helm users carefully.
 
----
+
 
 ### Risks & Trade-offs
 
@@ -229,7 +229,7 @@ spec:
 * **Rollout pause** → Stops updates, not running pods.
 * **Complex charts** → Hard to debug, encourage over-abstraction.
 
----
+
 
 ## Helm CLI cheat sheet
 
@@ -566,4 +566,3 @@ Commands index and plugin guide.
 * `kubectl scale` changes drift from Helm state. Persist intent in values where possible.
 * `--force` replaces resources and can briefly delete and recreate objects. Use with caution.
 
----

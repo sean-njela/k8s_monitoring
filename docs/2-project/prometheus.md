@@ -5,7 +5,7 @@ It was created at SoundCloud and is now a **CNCF graduated project** (same found
 
 Prometheus has become the **de facto standard for monitoring in cloud-native environments**, especially with Kubernetes, due to its **scalability, flexibility, and ecosystem**.
 
----
+
 
 ## Why Do We Need Monitoring?
 
@@ -32,7 +32,7 @@ Monitoring data comes in three main forms (the “**three pillars of observabili
 
 Prometheus focuses on **metrics**.
 
----
+
 
 ## Time-Series Basics
 
@@ -40,7 +40,7 @@ A **time series** is a sequence of values recorded at successive points in time.
 Example:
 
 | Time  | Metric    | Value |
-| ----- | --------- | ----- |
+| -- |  | -- |
 | 10:00 | CPU usage | 30%   |
 | 10:01 | CPU usage | 32%   |
 | 10:02 | CPU usage | 31%   |
@@ -54,13 +54,13 @@ Each metric in Prometheus is:
 This allows very powerful queries like:
 “How many `GET` requests per second returned a `500` error in the last 5 minutes?”
 
----
+
 
 ## Video Introduction
 
 <iframe width="7000" height="415" src="https://www.youtube-nocookie.com/embed/h4Sl21AKiDg?si=tg4ScT6Eq4yArrdx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
----
+
 
 ## How Prometheus Works
 
@@ -73,34 +73,34 @@ Prometheus is built around a **pull-based model**:
 5. **Alerting rules** can trigger alerts via **Alertmanager**.
 6. For short-lived jobs, metrics can be pushed via **Pushgateway**.
 
----
+
 
 ### Architecture Overview
 
 ```text
-          +-------------------+
+          +-+
           |    Applications   |
           |  Export metrics   |
-          +---------+---------+
+          +++
                     |
                     v
-          +---------+---------+
+          +++
           |  Exporters        |   (e.g. node_exporter, redis_exporter)
-          +---------+---------+
+          +++
                     |
                     v
-          +---------+---------+
+          +++
           | Prometheus Server |   (scrapes, stores, queries data)
-          +---------+---------+
+          +++
                |          |
          (alerts)    (queries)
                |          |
-          +----v----+ +---v---+
+          +-v-+ +v+
           |Alertmgr | | Grafana|
-          +---------+ +--------+
+          ++ +--+
 ```
 
----
+
 
 ## Metric Flow: From App → Prometheus → User
 
@@ -135,7 +135,7 @@ sequenceDiagram
 5. **Alertmanager** → gets triggered if rules match (CPU > 90%, target down, etc.).
 6. **User (SRE/DevOps)** → gets notified and investigates.
 
----
+
 
 ## Key Strengths of Prometheus
 
@@ -145,7 +145,7 @@ sequenceDiagram
 * **Ecosystem**: works with Grafana, Alertmanager, Pushgateway, Thanos, Cortex.
 * **Scalable**: handles thousands of metrics and targets efficiently.
 
----
+
 
 ## Limitations & Watch Outs
 
@@ -162,14 +162,14 @@ sequenceDiagram
 
 * **No built-in dashboards** → always paired with Grafana.
 
----
+
 
 ## PromQL — The Query Language
 
 Prometheus comes with **PromQL (Prometheus Query Language)**, which lets you slice, dice, and aggregate metrics.
 Think of it as SQL for time-series data.
 
----
+
 
 ### Selectors
 
@@ -206,7 +206,7 @@ node_memory_Active_bytes / node_memory_MemTotal_bytes > 0.9
 up == 0
 ```
 
----
+
 
 ## Alerting with Prometheus + Alertmanager
 
@@ -217,7 +217,7 @@ Prometheus defines alert rules. When triggered, alerts are sent to **Alertmanage
 * **Grouping** (combine related alerts).
 * **Delivery** (email, Slack, PagerDuty, etc.).
 
----
+
 
 ### Example Alert Rule
 
@@ -235,25 +235,25 @@ groups:
           description: "CPU > 85% for 2 minutes."
 ```
 
----
+
 
 ## Metric Types in Prometheus
 
 | Type        | Use For                                 | Example                                |
-| ----------- | --------------------------------------- | -------------------------------------- |
+| -- |  | -- |
 | `counter`   | Monotonically increasing values         | `http_requests_total` (total requests) |
 | `gauge`     | Arbitrary values (up & down)            | `memory_usage_bytes`, `temperature_c`  |
 | `histogram` | Buckets of observations (distribution)  | Request latency buckets                |
 | `summary`   | Similar to histogram, client-calculated | Percentiles of request durations       |
 
----
+
 
 ## Common Exporters
 
 Prometheus itself doesn’t know about your apps — exporters bridge the gap.
 
 | Exporter             | Purpose                                  |
-| -------------------- | ---------------------------------------- |
+| -- | - |
 | `node_exporter`      | Host/system metrics (CPU, memory, disk)  |
 | `blackbox_exporter`  | Probes HTTP, TCP, DNS endpoints          |
 | `postgres_exporter`  | PostgreSQL database metrics              |
@@ -262,7 +262,7 @@ Prometheus itself doesn’t know about your apps — exporters bridge the gap.
 | `cadvisor`           | Container runtime (Docker, Kubernetes)   |
 | `kube-state-metrics` | Kubernetes object states (Pods, Deploys) |
 
----
+
 
 ## Prometheus Configuration
 
@@ -279,7 +279,7 @@ scrape_configs:
 * `job_name`: Logical name for the service.
 * `targets`: Endpoints exposing `/metrics`.
 
----
+
 
 ## Security Best Practices
 
@@ -291,7 +291,7 @@ Prometheus itself has minimal security features:
 * Avoid sensitive labels (`user_id`, `token`).
 * Monitor Prometheus itself (`up`, `scrape_duration_seconds`).
 
----
+
 
 ## Scaling & Long-Term Storage
 
@@ -301,19 +301,19 @@ Prometheus is **single-node** by design. For large scale:
 * **Cortex** / **Mimir** → horizontally scalable, multi-tenant.
 * **Federation** → aggregate across Prometheus servers.
 
----
+
 
 ## Comparison with Alternatives
 
 | Tool       | Type           | Strengths                         | Weaknesses                |
-| ---------- | -------------- | --------------------------------- | ------------------------- |
+| - | -- |  | - |
 | Prometheus | Open-source    | CNCF standard, Kubernetes-native  | No long-term storage      |
 | InfluxDB   | Time-series DB | SQL-like query (Flux), dashboards | Less Kubernetes-native    |
 | Datadog    | SaaS           | Turnkey, integrations, great UI   | Expensive, vendor lock-in |
 | New Relic  | SaaS APM       | Tracing + metrics + logs          | Cost, complexity          |
 | Graphite   | Legacy OSS     | Simple, widely used historically  | Aging ecosystem           |
 
----
+
 
 ## Prometheus + Thanos Architecture
 
@@ -379,7 +379,7 @@ flowchart TD
     Q --> Alertmanager["Alertmanager"]
 ```
 
----
+
 
 ## Final Takeaway
 
@@ -390,4 +390,3 @@ Prometheus is:
 * **Scalable** with Thanos/Cortex.
 * **Best choice** for Kubernetes and microservices monitoring.
 
----

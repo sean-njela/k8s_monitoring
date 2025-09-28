@@ -11,7 +11,7 @@ Kubernetes already integrates with:
 
 If you deploy Prometheus (via Helm or the Operator), these metrics are automatically discovered and scraped — no extra setup required.
 
----
+
 
 ### 2. **App-specific exporters (most common in K8s)**
 
@@ -50,7 +50,7 @@ spec:
           - -nginx.scrape-uri=http://127.0.0.1:80/stub_status
         ports:
         - containerPort: 9113
----
+
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -72,7 +72,7 @@ kubectl get crd
 ```
 ![Output](../assets/servicemonitor.png)
 
----
+
 
 ### 3. **Custom metrics (for apps you write)**
 
@@ -107,7 +107,7 @@ Deploy the app with a Kubernetes `Deployment` and expose `/metrics`. Then define
 * **App metrics** → Exporters (Nginx, DBs, etc.) or custom instrumentation.
 * Prometheus scrapes everything; Grafana dashboards visualize it.
 
----
+
 
 ### What OpenTelemetry Adds
 
@@ -126,7 +126,7 @@ Backends supported:
 * Loki / ELK (logs)
 * Grafana Cloud or OTLP-compatible vendors
 
----
+
 
 ### 🛠 How It Works in Kubernetes
 
@@ -141,7 +141,7 @@ If you add **OpenTelemetry for your app**:
 2. Deploy an **OpenTelemetry Collector** (Deployment or DaemonSet).
 3. Configure it to export metrics in Prometheus format (scrapable endpoint).
 
----
+
 
 ### Example: OTel Collector in Kubernetes
 
@@ -173,7 +173,7 @@ spec:
       - name: config
         configMap:
           name: otel-collector-config
----
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -195,7 +195,7 @@ data:
         metrics:
           receivers: [otlp]
           exporters: [prometheus]
----
+
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -214,7 +214,7 @@ Now:
 * The Collector exposes Prometheus metrics on `:9464`.
 * Prometheus scrapes them via the `ServiceMonitor`.
 
----
+
 
 ### Why OTel is a Good Idea in Kubernetes
 
@@ -222,7 +222,7 @@ Now:
 * **Future-proof** → works with managed observability platforms (Datadog, New Relic, Grafana Cloud, etc.).
 * **Full observability** → unifies **metrics, traces, and logs**, not just CPU/memory.
 
----
+
 
 ## Adding any app to the stack
 
@@ -234,17 +234,20 @@ How to instrument *any app* for this stack (kube-prometheus-stack, Loki, Alertma
 
   * Kubernetes writes container logs to `/var/log/containers/*.log`.
   * Promtail DaemonSet (from Loki Helm chart) already tails these files.
+
 * **Labels**: Promtail auto-labels with `namespace`, `pod`, `container`, and `app_kubernetes_io/name`.
+
 * **App requirements**:
 
   * Use structured logging (JSON preferred).
   * Include severity, service name, request ID, etc. as fields. Promtail can parse JSON and promote fields to labels.
+
 * **Trade-off**:
 
   * Too many labels = high cardinality → Loki performance issues.
   * Use pipeline stages (`drop`, `replace`, `json`) to balance.
 
----
+
 
 ### 2. Metrics → Prometheus
 
@@ -253,17 +256,19 @@ How to instrument *any app* for this stack (kube-prometheus-stack, Loki, Alertma
 
   * Prometheus client libraries exist for Go, Python, Java, Node.js, etc.
   * Instrument key business metrics (requests, errors, durations).
+
 * **App requirements**:
 
   * Export metrics in Prometheus text format.
   * Add a Kubernetes `Service` with proper label selectors.
   * Create a `ServiceMonitor` that points to the Service.
+
 * **Alerting**:
 
   * Prometheus alerts are routed to Alertmanager, which you have configured.
   * Ensure metric names and labels are consistent with your alert rules.
 
----
+
 
 ### 3. Traces → OpenTelemetry (OTel)
 
@@ -274,12 +279,13 @@ How to instrument *any app* for this stack (kube-prometheus-stack, Loki, Alertma
   * Metrics → Prometheus remote-write (kube-prometheus-stack).
   * Logs → Loki (via OTLP → Loki exporter, or side-car Promtail).
   * Traces → Tempo or Jaeger (Grafana Tempo is the common pair with Loki).
+
 * **App requirements**:
 
   * Add OTel SDK instrumentation for HTTP, gRPC, DB calls.
   * Configure OTLP exporter to send to Collector endpoint.
 
----
+
 
 ### 4. Dashboards → Grafana
 
@@ -289,12 +295,13 @@ How to instrument *any app* for this stack (kube-prometheus-stack, Loki, Alertma
   * Metrics: build panels from `/metrics` data.
   * Logs: query `{app="myapp"}` in Explore or add log panels.
   * Traces: if Tempo integrated, add trace panels.
+
 * **Repeatability**:
 
   * Store dashboards as JSON in Git.
   * Provision them via ConfigMap + sidecar (`grafana_dashboard=1`) or GitOps pipeline.
 
----
+
 
 ### 5. Alerting
 
@@ -304,9 +311,10 @@ How to instrument *any app* for this stack (kube-prometheus-stack, Loki, Alertma
   * `http_requests_total` (rate of requests).
   * `http_request_duration_seconds` (latency).
   * `http_requests_errors_total` (error rate).
+
 * Alerts are defined as Prometheus rules, not app-side.
 
----
+
 
 ### 6. DevOps repeatability checklist
 
@@ -317,25 +325,29 @@ For *any app*:
    * stdout/stderr JSON logs.
    * Use structured fields: `level`, `service`, `trace_id`.
    * Confirm Promtail pipeline parses correctly.
+
 2. **Metrics**:
 
    * Add Prometheus client library.
    * Expose `/metrics`.
    * Apply Service + ServiceMonitor.
+
 3. **Tracing** (optional but recommended):
 
    * Add OTel SDK.
    * Configure OTLP export → OTel Collector.
+
 4. **Dashboards**:
 
    * Provision JSON dashboards via ConfigMaps or `grafana.dashboards` Helm values.
    * Tie logs, metrics, traces together using consistent labels (e.g. `service_name`).
+
 5. **Alerts**:
 
    * Define PrometheusRules based on app metrics.
    * Ensure routes in Alertmanager are set to notify the right channel/team.
 
----
+
 
 This makes any app pluggable into your stack: Prometheus Operator scrapes metrics, Promtail collects logs, OTel provides traces, Grafana visualises, Alertmanager handles alerts.
 
@@ -343,7 +355,7 @@ Here is a **golden template** you can drop into any microservice repo to instrum
 
 It is language-agnostic in structure, then broken into logging, metrics, and tracing.
 
----
+
 
 ## 📄 Golden Template for App Instrumentation
 
@@ -390,7 +402,7 @@ extraScrapeConfigs: |
           http_status:
 ```
 
----
+
 
 ### 2. Metrics → Prometheus
 
@@ -462,7 +474,7 @@ spec:
       interval: 30s
 ```
 
----
+
 
 ### 3. Tracing → OpenTelemetry
 
@@ -534,7 +546,7 @@ data:
     { "title": "MyApp Dashboard", "panels": [...] }
 ```
 
----
+
 
 ### 5. Alerts → Alertmanager
 
@@ -570,5 +582,5 @@ spec:
 
 Later you clould package this into a **starter Helm chart skeleton for apps** so you can just scaffold new services with logging, metrics, and tracing prewired?
 
----
+
 

@@ -9,7 +9,7 @@ Originally created by Torkel Ödegaard, Grafana has grown into a **CNCF incubati
 
 If Prometheus is the “brain” of monitoring (data collection & querying), Grafana is the **eyes** (dashboards & visualisations).
 
----
+
 
 ## Why Do We Need Grafana?
 
@@ -28,7 +28,7 @@ Grafana solves this by:
 
 Grafana = **single pane of glass for observability**.
 
----
+
 
 ## How Grafana Works
 
@@ -40,31 +40,31 @@ Grafana itself does **not collect data**. Instead, it:
 4. Organises panels into **dashboards**
 5. Provides **alerting & notifications** based on panel queries
 
----
+
 
 ### Architecture Overview
 
 ```text
-+------------------+
+++
 | Data Sources     |   (Prometheus, Loki, Tempo, etc.)
-+---------+--------+
+++--+
           |
           v
-+---------+---------+
++++
 |  Grafana Server   |
 |  - Query engine   |
 |  - Panels         |
 |  - Alerting       |
-+---------+---------+
++++
           |
-   +------+------+  
+   +++  
    | Dashboards |  
-   +------+------+  
+   +++  
           |
       End Users
 ```
 
----
+
 
 ## Data Flow: From Metrics → Grafana → User
 
@@ -81,7 +81,7 @@ sequenceDiagram
     G->>User: Send alerts (if configured)
 ```
 
----
+
 
 ## Example Grafana Panels
 
@@ -95,14 +95,14 @@ Grafana supports **many visualisation types**:
 
 Panels can be grouped into **dashboards** (e.g., “Kubernetes Cluster Health”).
 
----
+
 
 ## Common Data Sources
 
 Grafana supports **dozens of backends**. Most common:
 
 | Type          | Example                                       | Purpose                 |
-| ------------- | --------------------------------------------- | ----------------------- |
+| - |  | -- |
 | **Metrics**   | Prometheus, InfluxDB, Graphite                | Time-series metrics     |
 | **Logs**      | Loki, Elasticsearch, Splunk                   | Centralised logging     |
 | **Traces**    | Tempo, Jaeger, Zipkin                         | Distributed tracing     |
@@ -111,7 +111,7 @@ Grafana supports **dozens of backends**. Most common:
 
 Grafana turns it into a **multi-source observability platform**.
 
----
+
 
 ## Alerting in Grafana
 
@@ -134,7 +134,7 @@ Grafana provides a **unified alerting system** (since v8):
 3. If condition matches, an **alert fires**.
 4. Notification goes to configured channel.
 
----
+
 
 ## Installing Grafana
 
@@ -154,7 +154,7 @@ helm repo add grafana https://grafana.github.io/helm-charts
 helm install grafana grafana/grafana
 ```
 
----
+
 
 ## Security Best Practices
 
@@ -164,7 +164,7 @@ helm install grafana grafana/grafana
 * Use **folders & permissions** to restrict dashboard access.
 * Enable **audit logs** for compliance.
 
----
+
 
 ## Key Strengths of Grafana
 
@@ -175,7 +175,7 @@ helm install grafana grafana/grafana
 * **Unified alerting** with many integrations.
 * **Extensible** (plugins for panels, datasources, apps).
 
----
+
 
 ## Limitations & Watch Outs
 
@@ -184,7 +184,7 @@ helm install grafana grafana/grafana
 * **High availability setup** requires external DB (MySQL/Postgres).
 * **User management** is limited in OSS (Grafana Enterprise adds RBAC, reporting).
 
----
+
 
 ## Grafana in the Observability Stack
 
@@ -216,14 +216,14 @@ flowchart TD
 
 Grafana = **central observability frontend** for metrics, logs, and traces.
 
----
+
 
 ## Grafana Cheat Sheet
 
 ### Core Concepts
 
 | Term             | Meaning                                                 |
-| ---------------- | ------------------------------------------------------- |
+| - | - |
 | **Data source**  | External system providing data (Prometheus, Loki, etc.) |
 | **Panel**        | Single visualisation (graph, table, etc.)               |
 | **Dashboard**    | Collection of panels                                    |
@@ -231,7 +231,7 @@ Grafana = **central observability frontend** for metrics, logs, and traces.
 | **Organisation** | Multi-tenant separation in Grafana                      |
 | **Folder**       | Logical grouping of dashboards                          |
 
----
+
 
 ### Common Use Cases
 
@@ -241,7 +241,7 @@ Grafana = **central observability frontend** for metrics, logs, and traces.
 * **Application performance monitoring (APM)**.
 * **Log exploration** (with Loki/Elasticsearch).
 
----
+
 
 ## Final Takeaway
 
@@ -253,4 +253,3 @@ Grafana is:
 
 Think of Grafana as the **dashboard and control room** where DevOps, SREs, and engineers get their insights.
 
----
