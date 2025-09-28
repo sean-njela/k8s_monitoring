@@ -12,7 +12,7 @@ It provides:
 
 Prometheus **detects the problem**, but Alertmanager **tells humans (or systems) about it**.
 
----
+
 
 ## Why Do We Need Alertmanager?
 
@@ -29,7 +29,7 @@ Challenges Alertmanager solves:
 
 It’s the **traffic controller** for alerts.
 
----
+
 
 ## How Alertmanager Works
 
@@ -45,29 +45,29 @@ It’s the **traffic controller** for alerts.
 
 4. Users acknowledge alerts, silence them if needed, or take action.
 
----
+
 
 ### Architecture Overview
 
 ```text
-+-------------------+
++-+
 | Prometheus Server |  -->  Fires alerts
-+---------+---------+
++++
           |
           v
-+---------+---------+
++++
 | Alertmanager      |
 | - Grouping        |
 | - Routing         |
 | - Silencing       |
 | - Deduplication   |
-+---------+---------+
++++
    |   |   |   |
    v   v   v   v
  Email Slack PagerDuty Webhook
 ```
 
----
+
 
 ## Alert Flow: From Prometheus → Alertmanager → User
 
@@ -83,7 +83,7 @@ sequenceDiagram
     User->>AM: Silence/Ack alert (optional)
 ```
 
----
+
 
 ## Example Alert Rule in Prometheus
 
@@ -103,7 +103,7 @@ groups:
 
 When this condition is true, Prometheus sends an **alert** to Alertmanager.
 
----
+
 
 ## Alertmanager Configuration
 
@@ -137,7 +137,7 @@ inhibit_rules:
     equal: ['alertname', 'cluster']
 ```
 
----
+
 
 ### Explanation of Key Fields
 
@@ -150,7 +150,7 @@ inhibit_rules:
 * **receivers** → list of destinations (Slack, email, PagerDuty).
 * **inhibit\_rules** → suppress lower-priority alerts if a higher one is firing.
 
----
+
 
 ## Notification Integrations
 
@@ -162,7 +162,7 @@ Alertmanager supports many integrations out of the box:
 * **Webhook receivers** → integrate with any custom system
 * **Custom receivers** via webhooks
 
----
+
 
 ## Features of Alertmanager
 
@@ -190,7 +190,7 @@ Alertmanager supports many integrations out of the box:
 * Suppress less severe alerts when a higher severity alert is active.
 * Example: Hide “disk usage warning” if “disk full critical” is active.
 
----
+
 
 ## Alertmanager UI
 
@@ -201,7 +201,7 @@ Alertmanager provides a simple web UI (default port `:9093`) where you can:
 * Manage alert history
 * Debug routing
 
----
+
 
 ## Security Best Practices
 
@@ -210,7 +210,7 @@ Alertmanager provides a simple web UI (default port `:9093`) where you can:
 * Use **authentication** if exposed.
 * Secure communication between Prometheus and Alertmanager with TLS.
 
----
+
 
 ## Key Strengths of Alertmanager
 
@@ -220,7 +220,7 @@ Alertmanager provides a simple web UI (default port `:9093`) where you can:
 * **Silences & inhibition** → reduce noise & alert fatigue.
 * **Open-source & widely adopted** → large community.
 
----
+
 
 ## Limitations & Watch Outs
 
@@ -229,7 +229,7 @@ Alertmanager provides a simple web UI (default port `:9093`) where you can:
 * **Single binary** → HA requires running multiple instances with a gossip protocol.
 * **Alert storming** still possible if rules aren’t well-tuned.
 
----
+
 
 ## Alertmanager in the Observability Stack
 
@@ -260,14 +260,14 @@ flowchart TD
 
 Prometheus **detects**, Alertmanager **notifies**.
 
----
+
 
 ## Alertmanager Cheat Sheet
 
 ### Core Concepts
 
 | Term           | Meaning                                           |
-| -------------- | ------------------------------------------------- |
+| -- | - |
 | **Alert**      | Condition defined in Prometheus that triggers     |
 | **Receiver**   | Where alerts are sent (Slack, Email, etc.)        |
 | **Route**      | Rules that decide which receiver gets the alert   |
@@ -275,7 +275,7 @@ Prometheus **detects**, Alertmanager **notifies**.
 | **Inhibition** | Suppression of lower alerts when higher ones fire |
 | **Grouping**   | Bundling multiple alerts into one notification    |
 
----
+
 
 ### Example Silence Command
 
@@ -283,7 +283,7 @@ Prometheus **detects**, Alertmanager **notifies**.
 amtool silence add alertname=HighCPUUsage --duration=2h --comment="Maintenance window"
 ```
 
----
+
 
 ### Example Routing Rule
 
@@ -299,7 +299,7 @@ route:
       receiver: 'infra-team'
 ```
 
----
+
 
 ## Final Takeaway
 
@@ -312,4 +312,4 @@ Alertmanager is:
 
 Think of Prometheus as the **doctor detecting the illness**, and Alertmanager as the **nurse paging the right specialist**.
 
----
+

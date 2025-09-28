@@ -2,7 +2,7 @@
 
 **How to read dashboards & diagnose issues like a pro**
 
----
+
 
 ## The Big Picture — Why Dashboards Matter
 
@@ -16,7 +16,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
     Always think in terms of **symptoms → cause**.
     For example: *“Website is slow” (symptom) → “database CPU 100%” (cause).*
 
----
+
 
 ## Core Areas to Monitor
 
@@ -41,7 +41,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
   * Profile app (optimize queries, caching).
   * Investigate I/O subsystem if iowait high.
 
----
+
 
 ### 2. **Memory (RAM)**
 
@@ -64,7 +64,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
   * Add more RAM.
   * Optimize memory-heavy queries.
 
----
+
 
 ### 3. **Disk / Storage**
 
@@ -87,7 +87,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
   * Scale to larger disks.
   * Use faster storage (NVMe, SSD).
 
----
+
 
 ### 4. **Network**
 
@@ -110,7 +110,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
   * Throttle heavy clients.
   * Investigate load balancer.
 
----
+
 
 ### 5. **Containers / Pods**
 
@@ -133,7 +133,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
   * Adjust requests/limits in K8s.
   * Add replicas for load.
 
----
+
 
 ### 6. **Application Level**
 
@@ -154,7 +154,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
   * Add caching layer.
   * Optimize slow queries.
 
----
+
 
 ### 7. **Databases**
 
@@ -174,19 +174,19 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
   * Optimize queries.
   * Add read replicas.
 
----
+
 
 ### 8. **Logs & Events**
 
 * Dashboards often link to logs (via Loki, ELK, etc.).
 * Use them to confirm the *why* behind metrics.
 
----
+
 
 ## Diagnosis by Symptom
 
 | Symptom                  | Likely Cause                                      | Where to Look                   |
-| ------------------------ | ------------------------------------------------- | ------------------------------- |
+|  | - | - |
 | High latency (slow site) | CPU/memory saturated, DB slow, network congestion | CPU, memory, DB dashboards      |
 | Frequent 500 errors      | App crash, DB errors, bad config                  | App logs, DB metrics            |
 | Nodes going down         | Out of memory, disk full, network partition       | Node exporter, disk usage       |
@@ -194,7 +194,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
 | Traffic spike            | Legit user load vs DDoS                           | Network + load balancer metrics |
 | Disk full alerts         | Logs, data growth, temp files                     | Disk usage dashboard            |
 
----
+
 
 ## Method: How to Read a Dashboard Like a Pro
 
@@ -213,7 +213,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
 
    * If all pods restart at once → node issue, not app bug.
 
----
+
 
 ## World-Class Habits
 
@@ -222,7 +222,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
 * Build mental models: *Traffic ↑ → CPU ↑ → Latency ↑* is expected. If not, dig deeper.
 * Treat dashboards as **hypothesis tools**, not truth — confirm with logs, traces, configs.
 
----
+
 
 ## TL;DR Cheatsheet
 
@@ -235,7 +235,7 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
 * **Latency + errors** → app/db issue.
 * **Traffic spike** → scale or DDoS check.
 
----
+
 
 ## Troubleshooting Flow — From Alert → Root Cause
 
@@ -286,7 +286,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ```
 
----
+
 
 ## How to Use This Flow
 
@@ -307,12 +307,12 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
    * Example: high latency + high CPU = bottleneck.
    * Example: high latency + normal CPU/mem = likely DB or network.
 
----
+
 
 ## Key Dashboards to Check Along the Way
 
 | Step          | Dashboard / Metric                       | What It Tells You                |
-| ------------- | ---------------------------------------- | -------------------------------- |
+| - | - | -- |
 | Traffic spike | Prometheus `http_requests_total`         | Is the load abnormal?            |
 | CPU usage     | Node exporter `node_cpu_seconds_total`   | Is system CPU bound?             |
 | Memory & Swap | Node exporter `node_memory_MemAvailable` | Is system thrashing?             |
@@ -323,7 +323,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 | Network       | node\_network\_errors\_total             | NIC drops/retransmits?           |
 | Logs          | Loki / ELK / `docker logs`               | The “why” behind the metrics.    |
 
----
+
 
 ## Example Walkthroughs with Flow
 
@@ -352,7 +352,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * `/var/log` growing fast.
 * Fix: rotate logs, expand disk.
 
----
+
 
 # DevOps Mindset
 
@@ -362,7 +362,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Confirm with logs to know *why*.
 * Fix immediate issue → plan long-term solution.
 
----
+
 
 ## Troubleshooting Examples with Dashboards
 
@@ -399,7 +399,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Scale replicas from 3 → 6.
 * Add caching (e.g., Cloudflare / Redis).
 
----
+
 
 ## Scenario 2: High Error Rate (HTTP 500s)
 
@@ -431,7 +431,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Optimize slow queries.
 * Add a DB read replica if traffic keeps growing.
 
----
+
 
 ## Scenario 3: Container Keeps Restarting
 
@@ -462,7 +462,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Tune JVM heap settings.
 * Monitor for leaks.
 
----
+
 
 ## Scenario 4: Disk Full
 
@@ -493,7 +493,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Rotate/compress logs.
 * Increase disk size if needed.
 
----
+
 
 ## Scenario 5: Network Latency Spikes
 
@@ -522,7 +522,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Drain node-2 (`kubectl cordon node-2`).
 * Replace or troubleshoot hardware.
 
----
+
 
 ## Scenario 6: Prometheus Missing Metrics
 
@@ -552,12 +552,12 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Restart node-exporter.
 * Ensure no other process using 9100.
 
----
+
 
 ## Quick Troubleshooting Playbook
 
 | Symptom            | Where to Look             | Common Causes                                    | Actions                                |
-| ------------------ | ------------------------- | ------------------------------------------------ | -------------------------------------- |
+|  | - |  | -- |
 | High latency       | CPU, DB latency           | CPU saturation, slow queries, network congestion | Scale out, add cache, optimize queries |
 | High error rate    | Logs, app metrics         | DB pool exhausted, app crash, misconfig          | Fix DB, check app health               |
 | Container restarts | Container metrics, logs   | OOMKilled, crashloop, bad healthcheck            | Increase limits, debug app             |
@@ -565,7 +565,7 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 | Network drops      | NIC stats, node dashboard | Faulty NIC, congestion                           | Replace NIC, move workload             |
 | Missing metrics    | Prometheus targets        | Exporter down, scrape failure                    | Restart exporter, fix config           |
 
----
+
 
 With this playbook:
 
@@ -575,4 +575,4 @@ With this playbook:
 * Confirm with **logs**.
 * Apply **fix or scale**.
 
----
+

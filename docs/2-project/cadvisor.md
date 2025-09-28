@@ -15,7 +15,7 @@ cAdvisor is often used as a **metrics source** for **Prometheus** in Kubernetes 
 
 It’s lightweight, designed to run inside a container, and exposes metrics at an **HTTP endpoint** (`/metrics`) in Prometheus format.
 
----
+
 
 ## Why Do We Need cAdvisor?
 
@@ -32,7 +32,7 @@ Without cAdvisor:
 
 cAdvisor provides **fine-grained container-level metrics**, making it critical for **container monitoring**.
 
----
+
 
 ## What Does cAdvisor Monitor?
 
@@ -45,7 +45,7 @@ cAdvisor collects and exposes:
 * **Container lifecycle stats** (start, stop, restart).
 * **Custom labels** (Kubernetes adds pod, namespace, container name).
 
----
+
 
 ## How cAdvisor Works
 
@@ -58,32 +58,32 @@ cAdvisor collects and exposes:
 4. Tools like **Prometheus** scrape these metrics.
 5. **Grafana** visualises them in dashboards.
 
----
+
 
 ### Architecture Overview
 
 ```text
-+-------------------+
++-+
 |   Linux Kernel    |
 | (cgroups, stats)  |
-+---------+---------+
++++
           |
           v
-+---------+---------+
++++
 |   cAdvisor        |  (container metrics daemon)
-+---------+---------+
++++
           |
           v
-+-------------------+
++-+
 | /metrics endpoint |  --> Scraped by Prometheus
-+---------+---------+
++++
           |
-     +----v-----+
+     +-v--+
      | Grafana  |   (visualisation)
-     +----------+
+     +-+
 ```
 
----
+
 
 ## Metric Flow: From Container → cAdvisor → Prometheus → Grafana
 
@@ -105,7 +105,7 @@ sequenceDiagram
     Graf-->>User: Show dashboards
 ```
 
----
+
 
 ## Prometheus + cAdvisor Architecture
 
@@ -152,7 +152,7 @@ flowchart TD
     Prometheus --> A
 ```
 
----
+
 
 ### Explanation of the Flow
 
@@ -165,7 +165,7 @@ flowchart TD
 
 This stack gives **complete visibility** into container performance.
 
----
+
 
 ## Kubernetes + cAdvisor + Prometheus Architecture
 
@@ -207,7 +207,7 @@ flowchart TD
     Prometheus --> A
 ```
 
----
+
 
 ### Explanation of the Kubernetes Flow
 
@@ -225,7 +225,7 @@ flowchart TD
 
 In Kubernetes, you **don’t usually run standalone cAdvisor**. Instead, kubelet already provides cAdvisor-powered metrics.
 
----
+
 
 ## Example Metrics from cAdvisor
 
@@ -249,7 +249,7 @@ In Kubernetes, you **don’t usually run standalone cAdvisor**. Instead, kubelet
 * `container_fs_usage_bytes`
 * `container_fs_reads_bytes_total`
 
----
+
 
 ## Running cAdvisor
 
@@ -272,7 +272,7 @@ Access metrics at:
 * **UI**: `http://localhost:8080`
 * **Prometheus metrics**: `http://localhost:8080/metrics`
 
----
+
 
 ## cAdvisor in Kubernetes
 
@@ -284,7 +284,7 @@ In **Kubernetes**, cAdvisor is **built into the kubelet**:
 
 Many Kubernetes setups use **kubelet’s cAdvisor integration** rather than running cAdvisor as a separate container.
 
----
+
 
 ## Key Strengths of cAdvisor
 
@@ -294,7 +294,7 @@ Many Kubernetes setups use **kubelet’s cAdvisor integration** rather than runn
 * **Easy integration**: works out-of-the-box with Prometheus.
 * **UI dashboard**: basic real-time web UI included.
 
----
+
 
 ## Limitations & Watch Outs
 
@@ -307,7 +307,7 @@ Many Kubernetes setups use **kubelet’s cAdvisor integration** rather than runn
 
 * **Deprecation concern** → Standalone cAdvisor development has slowed since metrics are now integrated into Kubernetes kubelet.
 
----
+
 
 ## Example Prometheus Scrape Config for cAdvisor
 
@@ -318,7 +318,7 @@ scrape_configs:
       - targets: ['localhost:8080']
 ```
 
----
+
 
 ## Grafana Dashboards for cAdvisor
 
@@ -331,12 +331,12 @@ Grafana has many **pre-built dashboards** (via Grafana.com) for cAdvisor metrics
 
 Example dashboard ID: **893** (Google cAdvisor).
 
----
+
 
 ## Alternatives to cAdvisor
 
 | Tool                   | Focus                          | Notes                                   |
-| ---------------------- | ------------------------------ | --------------------------------------- |
+| - |  |  |
 | **node\_exporter**     | Host-level metrics             | No per-container visibility             |
 | **kubelet /metrics**   | Node & pod metrics in k8s      | Already includes cAdvisor functionality |
 | **Docker stats API**   | Docker container metrics       | Limited, less Prometheus-friendly       |
@@ -344,7 +344,7 @@ Example dashboard ID: **893** (Google cAdvisor).
 
 In Kubernetes, **cAdvisor + kubelet** is usually enough.
 
----
+
 
 ## Security Best Practices
 
@@ -353,14 +353,14 @@ In Kubernetes, **cAdvisor + kubelet** is usually enough.
 * Scrape metrics only from **trusted networks**.
 * Use Kubernetes RBAC with kubelet metrics proxying.
 
----
+
 
 ## cAdvisor Cheat Sheet
 
 ### Core Concepts
 
 | Term         | Meaning                                  |
-| ------------ | ---------------------------------------- |
+|  | - |
 | **cAdvisor** | Container metrics daemon (by Google)     |
 | **Source**   | Linux kernel cgroups + container runtime |
 | **Metrics**  | CPU, memory, disk, network per container |
@@ -374,7 +374,7 @@ container_memory_usage_bytes                  # Current memory usage
 container_network_receive_bytes_total         # Network RX bytes
 ```
 
----
+
 
 ## Final Takeaway
 
@@ -387,4 +387,3 @@ cAdvisor is:
 
 Think of cAdvisor as the **container-level metrics engine** that feeds Prometheus, while node\_exporter gives you host-level metrics.
 
----

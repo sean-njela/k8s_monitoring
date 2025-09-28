@@ -112,7 +112,7 @@ So:
 * Pod = direct connection to that Pod.
 * Service = convenience, so you don’t need to look up Pod names.
 
----
+
 
 So we run:
 
@@ -358,7 +358,7 @@ task: [status] kubectl get all -n k8s-monitoring-ns
 [status] statefulset.apps/prometheus-prometheus-kube-prometheus-prometheus       1/1     116m
 ```
 
----
+
 
 ### Setting up AlertManager with Slack
 
@@ -473,5 +473,158 @@ We then import the `grafana/dashboards/fake-logs-dashboard.json` file to visuali
 
 And with that done, so is our setup !
 
----
+## Some Caveats
+
+It is not production-ready by default. The stack (kube-prometheus-stack, Loki, Grafana, Alertmanager, OpenTelemetry) provides the core observability components, but production readiness depends on how it is configured, secured, and operated.
+
+### Gaps and risks:
+
+1. **Persistence**
+
+   * Default Helm charts often use emptyDir volumes. Data loss occurs on pod rescheduling.
+   * Loki, Prometheus, and Alertmanager require durable storage (PVCs on reliable storage classes).
+
+2. **High availability (HA)**
+
+   * kube-prometheus-stack deploys single replicas by default. Prometheus, Alertmanager, and Loki should run in HA mode with replication and sharding.
+
+3. **Scaling**
+
+   * Loki requires proper deployment mode (distributor, ingester, querier, etc.) for large clusters. Monolithic mode will not handle production workloads.
+   * Prometheus requires federation or Cortex/Thanos for horizontal scalability.
+
+4. **Security**
+
+   * RBAC must be minimal and auditable.
+   * Grafana and Alertmanager must not expose admin endpoints publicly without authentication and TLS.
+   * Secrets in Helm values should not be stored in plaintext.
+
+5. **Resource limits**
+
+   * Default charts lack tuned CPU/memory requests and limits. These must be set based on workload.
+
+6. **Backup and retention**
+
+   * No backup strategy for Prometheus TSDB, Loki indexes, or Alertmanager silences.
+   * Retention periods must be tuned for cost and compliance.
+
+7. **Networking**
+
+   * Ingress configuration requires TLS termination and WAF/firewall integration.
+   * Multi-tenant isolation may be required if different teams access Grafana or Loki.
+
+8. **Alerting pipeline**
+
+   * Alertmanager configuration must be HA and integrated with real notification systems (PagerDuty, OpsGenie, email, Slack).
+   * Silencing, inhibition, and deduplication must be tuned.
+
+9. **OpenTelemetry integration**
+
+   * Only provides traces/metrics/logs pipelines. Backend storage (Tempo, Jaeger, or vendor) is required.
+   * Exporters must be configured per language/runtime.
+
+10. **Operations**
+
+    * Helm upgrades can break CRDs. Proper GitOps or CI/CD integration is required.
+    * Dashboards and alerts must be version-controlled, not edited manually in Grafana.
+
+### Minimal production-ready setup requires:
+
+* HA Prometheus, Loki, and Alertmanager.
+* Persistent storage with backups.
+* TLS, RBAC, and external auth (OIDC) for Grafana.
+* Proper retention, capacity planning, and scaling.
+* Automated upgrades via GitOps (e.g., ArgoCD, Flux).
+* Centralised alert routing with redundancy.
+* Integration with a tracing backend (Tempo or Jaeger) if OpenTelemetry is used fully.
+
+## Using **Grafana Cloud**
+
+
+### Effect on our proposed stack
+
+1. **Prometheus / kube-prometheus-stack**
+
+   * You no longer run Prometheus in-cluster for long-term storage.
+   * Instead, you deploy the **Grafana Agent** (or Prometheus remote-write) in your cluster. It scrapes Kubernetes metrics and forwards them to Grafana Cloud’s Mimir backend.
+   * kube-prometheus-stack is unnecessary except if you still want local alerting or dashboards inside the cluster.
+
+2. **Loki**
+
+   * You do not run Loki in-cluster unless you want a local buffer.
+   * Logs are shipped with Grafana Agent, Fluent Bit, or Promtail to Grafana Cloud Loki.
+
+3. **Grafana**
+
+   * You do not deploy Grafana in-cluster. Dashboards are hosted in Grafana Cloud.
+   * You can still federate multiple data sources (cloud Loki, cloud Prometheus, external APIs).
+
+4. **Alertmanager**
+
+   * You do not run Alertmanager. Alert routing is handled in Grafana Cloud’s alerting service.
+   * You must re-implement silences, inhibition, and notification channels in Grafana Cloud.
+
+5. **OpenTelemetry**
+
+   * You deploy the OpenTelemetry Collector in your cluster.
+   * The collector exports traces and metrics directly to Grafana Cloud Tempo (for traces) and Mimir (for metrics).
+   * No need to deploy Tempo or Jaeger locally.
+
+
+
+### Setup steps
+
+1. **Sign up and create a Grafana Cloud stack**
+
+   * Provision an account with metrics, logs, and traces enabled.
+   * Obtain API keys (for metrics, logs, traces).
+
+2. **Deploy Grafana Agent in Kubernetes**
+
+   * Install via Helm or YAML manifests.
+   * Configure it to:
+
+     * Scrape kubelet, kube-state-metrics, node exporter.
+     * Remote-write to Grafana Cloud Prometheus endpoint.
+     * Forward logs via Loki endpoint.
+     * Ship traces via Tempo endpoint (optionally through OTLP).
+
+3. **Deploy OpenTelemetry Collector**
+
+   * Configure it to receive OTLP (from application SDKs).
+   * Export traces and metrics to Grafana Cloud endpoints.
+
+4. **Remove redundant in-cluster components**
+
+   * No need for Prometheus statefulset, Loki statefulset, Grafana deployment, or Alertmanager.
+   * Keep kube-state-metrics and node exporter, since they are needed for scraping.
+
+5. **Configure dashboards and alerting in Grafana Cloud**
+
+   * Import Kubernetes dashboards (pre-built).
+   * Define alert rules centrally in Grafana Cloud.
+   * Integrate notification channels (PagerDuty, Slack, Teams, email).
+
+6. **Secure connections**
+
+   * Use Grafana Cloud TLS endpoints.
+   * Store API keys as Kubernetes secrets.
+   * Apply RBAC to agents and collectors.
+
+### Trade-offs
+
+**Advantages**
+
+* No stateful services to manage in-cluster.
+* Scalability and HA are handled by Grafana Cloud.
+* Integrated UI for metrics, logs, traces, and alerts.
+* Faster onboarding and less operational risk.
+
+**Disadvantages**
+
+* Vendor lock-in to Grafana Cloud APIs and billing model.
+* Costs scale with data ingestion volume.
+* Less control over retention and storage backends.
+* Alerts require re-implementation in Grafana Cloud (cannot reuse Alertmanager config directly).
+* If compliance requires on-prem retention, this may fail audits.
 
