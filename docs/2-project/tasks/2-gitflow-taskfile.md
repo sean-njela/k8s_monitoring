@@ -126,4 +126,4 @@ Avoid using it if:
 
 ## Contact
 
-Questions or issues with GitFlow setup? Reach out via [GitHub Issues](https://github.com/sean-njela/demo_monitoring/issues) or email at [seannjela@outlook.com](mailto:seannjela@outlook.com).
+Questions or issues with GitFlow setup? Reach out via [GitHub Issues](https://github.com/sean-njela/k8s_monitoring/issues) or email at [seannjela@outlook.com](mailto:seannjela@outlook.com).

@@ -2,8 +2,6 @@
 
 **How to read dashboards & diagnose issues like a pro**
 
-
-
 ## The Big Picture — Why Dashboards Matter
 
 Dashboards are not just “pretty graphs” — they answer **3 core questions**:
@@ -16,172 +14,174 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
     Always think in terms of **symptoms → cause**.
     For example: *“Website is slow” (symptom) → “database CPU 100%” (cause).*
 
-
-
 ## Core Areas to Monitor
 
 ### 1. **CPU**
 
 * **What to look for:**
 
-  * `% usage` per core and overall.
-  * Breakdown: **system**, **user**, **iowait**.
+    * `% usage` per core and overall.
+    * Breakdown: **system**, **user**, **iowait**.
+
 * **Rules of thumb:**
 
-  * <70% sustained → healthy.
-  * > 90% sustained → CPU bottleneck.
+    * <70% sustained → healthy.
+    * > 90% sustained → CPU bottleneck.
+
 * **What it means:**
 
-  * **High user CPU** → app code is working hard (expected under load).
-  * **High system CPU** → kernel, syscalls, maybe networking overhead.
-  * **High iowait** → CPU is waiting on disk/network → possible I/O bottleneck.
+    * **High user CPU** → app code is working hard (expected under load).
+    * **High system CPU** → kernel, syscalls, maybe networking overhead.
+    * **High iowait** → CPU is waiting on disk/network → possible I/O bottleneck.
+
 * **Actions:**
 
-  * Add replicas / scale service.
-  * Profile app (optimize queries, caching).
-  * Investigate I/O subsystem if iowait high.
-
-
+    * Add replicas / scale service.
+    * Profile app (optimize queries, caching).
+    * Investigate I/O subsystem if iowait high.
 
 ### 2. **Memory (RAM)**
 
 * **What to look for:**
 
-  * Total used vs total available.
-  * Cache/buffers vs actual application usage.
-  * Swap usage.
+    * Total used vs total available.
+    * Cache/buffers vs actual application usage.
+    * Swap usage.
+
 * **Rules of thumb:**
 
-  * If memory is “full” but mostly cache → not a problem (Linux uses free RAM for caching).
-  * If swap is active → real memory pressure.
+    * If memory is “full” but mostly cache → not a problem (Linux uses free RAM for caching).
+    * If swap is active → real memory pressure.
+
 * **What it means:**
 
-  * **High app usage** → possible memory leak or undersized instance.
-  * **High swap usage** → system thrashing, huge slowdown.
+    * **High app usage** → possible memory leak or undersized instance.
+    * **High swap usage** → system thrashing, huge slowdown.
+
 * **Actions:**
 
-  * Restart leaking service.
-  * Add more RAM.
-  * Optimize memory-heavy queries.
-
-
+    * Restart leaking service.
+    * Add more RAM.
+    * Optimize memory-heavy queries.
 
 ### 3. **Disk / Storage**
 
 * **Metrics:**
 
-  * Disk usage %.
-  * IOPS (reads/writes per second).
-  * Latency (avg read/write ms).
+    * Disk usage %.
+    * IOPS (reads/writes per second).
+    * Latency (avg read/write ms).
+
 * **Rules of thumb:**
 
-  * > 80% disk full → plan cleanup/expansion.
-  * Latency >20ms on SSDs → bottleneck.
+    * > 80% disk full → plan cleanup/expansion.
+    * Latency >20ms on SSDs → bottleneck.
+
 * **What it means:**
 
-  * High latency + high iowait → storage bottleneck.
-  * High disk usage → risk of system crash when full.
+    * High latency + high iowait → storage bottleneck.
+    * High disk usage → risk of system crash when full.
+
 * **Actions:**
 
-  * Clear logs / rotate.
-  * Scale to larger disks.
-  * Use faster storage (NVMe, SSD).
-
-
+    * Clear logs / rotate.
+    * Scale to larger disks.
+    * Use faster storage (NVMe, SSD).
 
 ### 4. **Network**
 
 * **Metrics:**
 
-  * Bandwidth in/out.
-  * Packet drops/errors.
-  * Latency / RTT.
+    * Bandwidth in/out.
+    * Packet drops/errors.
+    * Latency / RTT.
+
 * **Rules of thumb:**
 
-  * Bandwidth near link limit (e.g. 1Gbps NIC at 950Mbps) → saturation.
-  * Packet drops/errors >0 → network health issue.
+    * Bandwidth near link limit (e.g. 1Gbps NIC at 950Mbps) → saturation.
+    * Packet drops/errors >0 → network health issue.
+
 * **What it means:**
 
-  * High outbound traffic → app serving lots of data (normal or DDoS).
-  * Latency spikes → congestion, routing problems.
+    * High outbound traffic → app serving lots of data (normal or DDoS).
+    * Latency spikes → congestion, routing problems.
+
 * **Actions:**
 
-  * Scale horizontally (more nodes).
-  * Throttle heavy clients.
-  * Investigate load balancer.
-
-
+    * Scale horizontally (more nodes).
+    * Throttle heavy clients.
+    * Investigate load balancer.
 
 ### 5. **Containers / Pods**
 
 * **Metrics:**
 
-  * CPU & memory per container.
-  * Container restarts (counter).
-  * Pod status (running, crashloop).
+    * CPU & memory per container.
+    * Container restarts (counter).
+    * Pod status (running, crashloop).
+
 * **Red flags:**
 
-  * Containers restarting repeatedly → crashloop, misconfiguration.
-  * CPU/memory throttling in Kubernetes.
+    * Containers restarting repeatedly → crashloop, misconfiguration.
+    * CPU/memory throttling in Kubernetes.
+
 * **What it means:**
 
-  * Misconfigured resource limits.
-  * App bugs (OOMKilled, segfaults).
+    * Misconfigured resource limits.
+    * App bugs (OOMKilled, segfaults).
+
 * **Actions:**
 
-  * Check logs for container crash cause.
-  * Adjust requests/limits in K8s.
-  * Add replicas for load.
-
-
+    * Check logs for container crash cause.
+    * Adjust requests/limits in K8s.
+    * Add replicas for load.
 
 ### 6. **Application Level**
 
 * **Key metrics (the “Golden Signals” from Google SRE):**
 
-  * **Latency** → how long requests take.
-  * **Traffic** → requests per second.
-  * **Errors** → % of failed requests.
-  * **Saturation** → how “full” the system is (queues, memory).
+    * **Latency** → how long requests take.
+    * **Traffic** → requests per second.
+    * **Errors** → % of failed requests.
+    * **Saturation** → how “full” the system is (queues, memory).
+
 * **Interpretation:**
 
-  * High latency + high errors → app/service bottleneck.
-  * High latency + low CPU/memory → external dependency issue.
-  * High traffic spikes → expected? or DDoS?
+    * High latency + high errors → app/service bottleneck.
+    * High latency + low CPU/memory → external dependency issue.
+    * High traffic spikes → expected? or DDoS?
+
 * **Actions:**
 
-  * Scale service horizontally.
-  * Add caching layer.
-  * Optimize slow queries.
-
-
+    * Scale service horizontally.
+    * Add caching layer.
+    * Optimize slow queries.
 
 ### 7. **Databases**
 
 * **Metrics:**
 
-  * Query throughput (QPS).
-  * Query latency.
-  * Locks, deadlocks.
-  * Buffer cache hit ratio.
+    * Query throughput (QPS).
+    * Query latency.
+    * Locks, deadlocks.
+    * Buffer cache hit ratio.
+
+
 * **Red flags:**
 
-  * Slow queries → long latency spikes.
-  * Lock waits → contention.
+    * Slow queries → long latency spikes.
+    * Lock waits → contention.
+
 * **Actions:**
 
-  * Add indexes.
-  * Optimize queries.
-  * Add read replicas.
-
-
+    * Add indexes.
+    * Optimize queries.
+    * Add read replicas.
 
 ### 8. **Logs & Events**
 
 * Dashboards often link to logs (via Loki, ELK, etc.).
 * Use them to confirm the *why* behind metrics.
-
-
 
 ## Diagnosis by Symptom
 
@@ -194,26 +194,25 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
 | Traffic spike            | Legit user load vs DDoS                           | Network + load balancer metrics |
 | Disk full alerts         | Logs, data growth, temp files                     | Disk usage dashboard            |
 
-
-
 ## Method: How to Read a Dashboard Like a Pro
 
 1. **Start broad → drill down**
 
-   * Begin with system overview (CPU/mem/disk).
-   * Narrow to container/pod → app → DB.
+    * Begin with system overview (CPU/mem/disk).
+    * Narrow to container/pod → app → DB.
+
 2. **Look for correlations**
 
-   * High CPU at same time as latency spikes?
-   * High iowait + disk latency → storage problem.
+    * High CPU at same time as latency spikes?
+    * High iowait + disk latency → storage problem.
+
 3. **Timeline matters**
 
-   * Spikes vs sustained trends tell different stories.
+    * Spikes vs sustained trends tell different stories.
+
 4. **Always check for “innocent victims”**
 
-   * If all pods restart at once → node issue, not app bug.
-
-
+    * If all pods restart at once → node issue, not app bug.
 
 ## World-Class Habits
 
@@ -221,8 +220,6 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
 * Watch **rate of change**, not just absolute numbers (e.g., 10GB logs written/hour).
 * Build mental models: *Traffic ↑ → CPU ↑ → Latency ↑* is expected. If not, dig deeper.
 * Treat dashboards as **hypothesis tools**, not truth — confirm with logs, traces, configs.
-
-
 
 ## TL;DR Cheatsheet
 
@@ -234,8 +231,6 @@ Dashboards are not just “pretty graphs” — they answer **3 core questions**
 * **Container restarts** → crashloop (logs!).
 * **Latency + errors** → app/db issue.
 * **Traffic spike** → scale or DDoS check.
-
-
 
 ## Troubleshooting Flow — From Alert → Root Cause
 
@@ -286,28 +281,24 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 ```
 
-
-
 ## How to Use This Flow
 
 1. **Start at the Symptom**
 
-   * Alert: high latency, errors, disk full, pod restarts.
-   * User complaint: “site is slow” / “app keeps crashing”.
+    * Alert: high latency, errors, disk full, pod restarts.
+    * User complaint: “site is slow” / “app keeps crashing”.
 
 2. **Pick the Path**
 
-   * Latency → traffic → CPU/mem → DB → network.
-   * Errors → logs → DB/app configs → containers.
-   * Container down → check limits → healthchecks → logs.
-   * Disk full → check log growth → cleanup → expand.
+    * Latency → traffic → CPU/mem → DB → network.
+    * Errors → logs → DB/app configs → containers.
+    * Container down → check limits → healthchecks → logs.
+    * Disk full → check log growth → cleanup → expand.
 
 3. **Correlate Across Layers**
 
-   * Example: high latency + high CPU = bottleneck.
-   * Example: high latency + normal CPU/mem = likely DB or network.
-
-
+    * Example: high latency + high CPU = bottleneck.
+    * Example: high latency + normal CPU/mem = likely DB or network.
 
 ## Key Dashboards to Check Along the Way
 
@@ -322,8 +313,6 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 | Disk I/O      | node\_disk\_read/write\_time             | Storage bottleneck?              |
 | Network       | node\_network\_errors\_total             | NIC drops/retransmits?           |
 | Logs          | Loki / ELK / `docker logs`               | The “why” behind the metrics.    |
-
-
 
 ## Example Walkthroughs with Flow
 
@@ -352,17 +341,13 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * `/var/log` growing fast.
 * Fix: rotate logs, expand disk.
 
-
-
 # DevOps Mindset
 
 * Always think in **layers**:
-  **User → Load Balancer → App → DB → OS → Hardware/Network**.
+    **User → Load Balancer → App → DB → OS → Hardware/Network**.
 * Use dashboards to narrow down *which layer is misbehaving*.
 * Confirm with logs to know *why*.
 * Fix immediate issue → plan long-term solution.
-
-
 
 ## Troubleshooting Examples with Dashboards
 
@@ -399,8 +384,6 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Scale replicas from 3 → 6.
 * Add caching (e.g., Cloudflare / Redis).
 
-
-
 ## Scenario 2: High Error Rate (HTTP 500s)
 
 ### Symptom:
@@ -431,8 +414,6 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Optimize slow queries.
 * Add a DB read replica if traffic keeps growing.
 
-
-
 ## Scenario 3: Container Keeps Restarting
 
 ### Symptom:
@@ -461,8 +442,6 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Increase memory limit to 1GB.
 * Tune JVM heap settings.
 * Monitor for leaks.
-
-
 
 ## Scenario 4: Disk Full
 
@@ -493,8 +472,6 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Rotate/compress logs.
 * Increase disk size if needed.
 
-
-
 ## Scenario 5: Network Latency Spikes
 
 ### Symptom:
@@ -521,8 +498,6 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 
 * Drain node-2 (`kubectl cordon node-2`).
 * Replace or troubleshoot hardware.
-
-
 
 ## Scenario 6: Prometheus Missing Metrics
 
@@ -552,8 +527,6 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 * Restart node-exporter.
 * Ensure no other process using 9100.
 
-
-
 ## Quick Troubleshooting Playbook
 
 | Symptom            | Where to Look             | Common Causes                                    | Actions                                |
@@ -565,8 +538,6 @@ F1 -->|No but I/O high| F4["Check IOPS & latency"]
 | Network drops      | NIC stats, node dashboard | Faulty NIC, congestion                           | Replace NIC, move workload             |
 | Missing metrics    | Prometheus targets        | Exporter down, scrape failure                    | Restart exporter, fix config           |
 
-
-
 With this playbook:
 
 * Start at **symptom** (latency, errors, restarts).
@@ -574,5 +545,3 @@ With this playbook:
 * Correlate across **layers** (infra → container → app → DB).
 * Confirm with **logs**.
 * Apply **fix or scale**.
-
-
